@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "Tab Rename" },
+  "extensionDescription": { "message": "本地优先、可预测的标签页重命名工具" },
+  "openPopup": { "message": "重命名当前标签页" }
+}

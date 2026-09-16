@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "Tab Rename" },
+  "extensionDescription": { "message": "A local-first, predictable tab renaming tool" },
+  "openPopup": { "message": "Rename the current tab" }
+}
