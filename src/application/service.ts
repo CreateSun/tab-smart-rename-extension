@@ -122,6 +122,7 @@ export async function handleUiRequest(message: UiRequest): Promise<unknown> {
   }
   if (message.type === "REQUEST_HOST_PERMISSION") return chrome.permissions.request({ origins: ["http://*/*", "https://*/*"] });
   if (message.type === "COMPLETE_ONBOARDING") return markOnboardingComplete();
+  if (message.type === "OPEN_OPTIONS") return chrome.runtime.openOptionsPage();
   return structuredClone(DEFAULT_STATE);
 }
 

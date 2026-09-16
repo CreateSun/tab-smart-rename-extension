@@ -4,7 +4,7 @@
 
 ## 已实施
 
-- Manifest V3 可构建扩展、popup、options、onboarding、快捷键和右键入口。
+- Manifest V3 可构建扩展、页面内全屏命名层、options、onboarding、快捷键和右键入口。
 - Page、Tab session、精确 URL、域名规则的数据模型与统一优先级解析。
 - `chrome.storage.local` 永久状态、`chrome.storage.session` 标签状态及关闭标签清理。
 - 动态标题 MutationObserver 守护、150ms 合并、插件写入去环、无 title 创建。
@@ -20,7 +20,7 @@
 
 - Popup 增加“暂停当前站点/恢复”入口，并完成打开标签即时回退验收。
 - 导入合法与非法规则混合时增加预览、错误明细和用户确认，再原子提交。
-- 将 popup、options、onboarding 全部接入简体中文/英文本地化。
+- 将页面内命名层、options、onboarding 全部接入简体中文/英文本地化。
 - 管理页编辑从浏览器 prompt 改为可访问表单，并补齐字段级错误。
 - 增加 application/background 的消息 payload、sender、tab 竞态自动化测试。
 - 增加 Chrome E2E：三种模式、同 URL 多 tab、导航/刷新、权限拒绝、规则变更和 service worker 重启。

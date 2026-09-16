@@ -1,2 +1,20 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>欢迎使用 Tab Rename</title><link rel="stylesheet" href="styles.css"></head>
-<body><main class="onboarding"><p class="eyebrow">WELCOME TO TAB RENAME</p><h1>标签名，由你决定。</h1><p class="lead">快速区分相似页面，同时清楚知道名称会保留多久。</p><div class="cards"><article><strong>仅当前页面</strong><p>适合临时备注。刷新或导航后消失。</p></article><article><strong>当前标签</strong><p>默认模式。刷新与导航后仍保留，关闭标签后消失。</p></article><article><strong>永久规则</strong><p>按精确 URL 或域名匹配未来页面。</p></article></div><section class="notice"><h2>打开方式</h2><p>点击工具栏图标，或按 <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd>。可在 <code>chrome://extensions/shortcuts</code> 修改快捷键。</p><p>受浏览器保护的页面无法修改。所有数据只保存在本机，不上传、不遥测。</p></section><button id="start">开始使用</button></main><script src="onboarding.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>欢迎使用 Tab Rename</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="onboarding.css"></head>
+<body class="welcome-page">
+  <main class="welcome">
+    <nav><span class="brand-mark">R</span><strong>Tab Smart Rename</strong><span class="local-pill">只在本机运行</span></nav>
+    <section class="hero">
+      <p class="eyebrow">安装完成</p><h1>给每个标签，<br>一个一眼认出的名字。</h1>
+      <p class="lead">在任意普通网页呼出全屏命名界面。没有拥挤的小窗口，也没有上传数据。</p>
+      <div class="shortcut-card"><div><span>最快打开方式</span><strong id="shortcutLabel">⇧ ⌘ R</strong></div><button id="checkShortcut" class="secondary">检查快捷键</button></div>
+      <p id="shortcutStatus" class="shortcut-status" role="status">macOS 默认建议使用 ⇧ + ⌘ + R；Chrome 若将其保留为硬刷新，请在快捷键页重新确认或分配。</p>
+    </section>
+    <section class="steps" aria-label="使用步骤">
+      <article><span>01</span><div><strong>呼出界面</strong><p>按快捷键，或点击浏览器工具栏中的扩展图标。</p></div></article>
+      <article><span>02</span><div><strong>输入名称</strong><p>输入后选择只保留在这一页、这个标签，或建立永久规则。</p></div></article>
+      <article><span>03</span><div><strong>回到工作</strong><p>按 Enter 保存，按 Esc 随时关闭。动态网页也会保持你的名称。</p></div></article>
+    </section>
+    <footer><p>受保护页面无法修改 · 默认不请求全站权限 · 无网络请求与遥测</p><button id="start">开始使用 <span>→</span></button></footer>
+  </main><script src="onboarding.js"></script>
+</body></html>

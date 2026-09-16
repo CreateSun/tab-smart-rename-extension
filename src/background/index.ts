@@ -15,6 +15,23 @@ async function syncAutomaticContentScript(): Promise<void> {
   }
 }
 
+async function openRenameOverlay(tabId?: number): Promise<void> {
+  const tab = tabId ? await chrome.tabs.get(tabId) : (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
+  if (!tab?.id || !tab.url) return;
+  try {
+    await chrome.tabs.sendMessage(tab.id, { type: "OPEN_RENAME_OVERLAY" });
+  } catch {
+    try {
+      await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["content.js"] });
+      await chrome.tabs.sendMessage(tab.id, { type: "OPEN_RENAME_OVERLAY" });
+    } catch {
+      await chrome.action.setBadgeBackgroundColor({ color: "#B42318", tabId: tab.id });
+      await chrome.action.setBadgeText({ text: "!", tabId: tab.id });
+      setTimeout(() => void chrome.action.setBadgeText({ text: "", tabId: tab.id }), 1800);
+    }
+  }
+}
+
 chrome.runtime.onInstalled.addListener((details) => {
   chrome.contextMenus.removeAll().then(() => chrome.contextMenus.create({ id: MENU_ID, title: "重命名此标签页…", contexts: ["page"] }));
   if (details.reason === "install") chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
@@ -23,11 +40,12 @@ chrome.runtime.onInstalled.addListener((details) => {
 chrome.runtime.onStartup.addListener(() => { void syncAutomaticContentScript(); });
 chrome.permissions.onAdded.addListener(() => { void syncAutomaticContentScript().then(() => refreshOpenTabs()); });
 chrome.permissions.onRemoved.addListener(() => { void syncAutomaticContentScript().then(() => refreshOpenTabs()); });
+chrome.action.onClicked.addListener((tab) => { void openRenameOverlay(tab.id); });
+chrome.commands.onCommand.addListener((command) => { if (command === "_execute_action") void openRenameOverlay(); });
 
-chrome.contextMenus.onClicked.addListener(async (info) => {
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId !== MENU_ID) return;
-  try { await chrome.action.openPopup(); }
-  catch { await chrome.windows.create({ url: chrome.runtime.getURL("popup.html"), type: "popup", width: 420, height: 620 }); }
+  await openRenameOverlay(tab?.id);
 });
 
 chrome.runtime.onMessage.addListener((message: UiRequest | ContentEvent, sender, sendResponse) => {

@@ -1,0 +1,30 @@
+.welcome-page { min-width: 0; min-height: 100vh; background: #f1f5f0; color: #13281b; }
+.welcome-page::before, .welcome-page::after { content: ""; position: fixed; width: 42vw; height: 42vw; border-radius: 50%; filter: blur(10px); opacity: .45; pointer-events: none; }
+.welcome-page::before { left: -16vw; top: -20vw; background: radial-gradient(circle, #c9ead5, transparent 68%); }
+.welcome-page::after { right: -17vw; bottom: -22vw; background: radial-gradient(circle, #f4ddad, transparent 67%); }
+.welcome { position: relative; z-index: 1; width: min(1040px, calc(100% - 48px)); margin: 0 auto; padding: 30px 0 38px; }
+.welcome nav { display: flex; align-items: center; gap: 11px; font-size: 14px; }
+.brand-mark { display: grid; place-items: center; width: 33px; height: 33px; border-radius: 10px; background: #176c45; color: white; font: 800 16px Georgia, serif; box-shadow: 0 8px 18px #176c4533; }
+.local-pill { margin-left: auto; padding: 7px 11px; border: 1px solid #d4dfd6; border-radius: 999px; color: #65736a; font-size: 12px; font-weight: 650; background: #ffffff80; }
+.hero { max-width: 790px; margin: 10vh auto 58px; text-align: center; }
+.hero .eyebrow { margin-bottom: 16px; }
+.hero h1 { margin: 0; font: 700 clamp(46px, 7vw, 78px)/1.03 Georgia, "Times New Roman", serif; letter-spacing: -.05em; text-wrap: balance; color: #10271a; }
+.hero .lead { max-width: 650px; margin: 24px auto 30px; font-size: 18px; line-height: 1.7; color: #647269; }
+.shortcut-card { display: flex; align-items: center; justify-content: space-between; gap: 28px; max-width: 590px; margin: 0 auto; padding: 16px 18px 16px 22px; border: 1px solid #cbd9ce; border-radius: 18px; background: #ffffffc7; box-shadow: 0 18px 60px #315c3d16; backdrop-filter: blur(18px); text-align: left; }
+.shortcut-card div { display: flex; align-items: center; gap: 18px; }
+.shortcut-card div > span { color: #728078; font-size: 12px; font-weight: 700; }
+.shortcut-card strong { color: #153d27; font-size: 21px; letter-spacing: .025em; }
+.shortcut-status { max-width: 610px; min-height: 36px; margin: 12px auto 0; color: #77837b; font-size: 12px; line-height: 1.5; }
+.shortcut-status.needs-action { color: #a15c16; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-top: 26px; border-top: 1px solid #d8e1da; }
+.steps article { display: flex; gap: 17px; padding: 18px; border-radius: 16px; transition: .25s ease; }
+.steps article:hover { background: #ffffffa6; transform: translateY(-3px); }
+.steps article > span { color: #238459; font: 700 12px/1.3 ui-monospace, monospace; }
+.steps strong { font-size: 15px; }
+.steps p { margin: 7px 0 0; color: #6b786f; font-size: 13px; line-height: 1.55; }
+.welcome footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 32px; padding-top: 24px; border-top: 1px solid #d8e1da; }
+.welcome footer p { margin: 0; color: #78847c; font-size: 12px; }
+.welcome footer button { padding: 13px 21px; border-radius: 12px; }
+.welcome footer button span { margin-left: 9px; opacity: .65; }
+@media (max-width: 720px) { .welcome { width: min(100% - 28px, 1040px); } .hero { margin-top: 8vh; } .hero h1 { font-size: 46px; } .steps { grid-template-columns: 1fr; } .shortcut-card, .welcome footer { align-items: stretch; flex-direction: column; } .shortcut-card { text-align: center; } .shortcut-card div { justify-content: center; flex-direction: column; gap: 4px; } .welcome footer p { text-align: center; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }

@@ -24,13 +24,15 @@ export type UiRequest =
   | { type: "EXPORT_RULES" }
   | { type: "IMPORT_RULES"; json: string }
   | { type: "REQUEST_HOST_PERMISSION" }
-  | { type: "COMPLETE_ONBOARDING" };
+  | { type: "COMPLETE_ONBOARDING" }
+  | { type: "OPEN_OPTIONS" };
 
 export type ContentRequest =
   | { type: "GET_PAGE_STATE" }
   | { type: "SET_PAGE_OVERRIDE"; name: string | null; suppress?: boolean }
   | { type: "APPLY_DECISION"; name: string | null; debounceMs: number }
-  | { type: "CLEAR_DECISION" };
+  | { type: "CLEAR_DECISION" }
+  | { type: "OPEN_RENAME_OVERLAY" };
 
 export type ContentState = { originalTitle: string; pageOverride: { kind: "name"; name: string } | { kind: "suppress" } | null };
 export type ContentEvent = { type: "PAGE_FACT_CHANGED" };

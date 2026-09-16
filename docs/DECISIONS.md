@@ -14,10 +14,16 @@
 
 Page override 存在 content-script 内存中，因此刷新、跨文档导航和关闭标签自然清除；hash/history 的同文档导航也由 URL 变化清除。Tab override 存入 `chrome.storage.session` 并以 tabId 关联，tab 关闭时删除。它不会迁移到 local storage，也不会成为永久规则。
 
-## ADR-004：右键入口与兼容降级
+## ADR-004：右键入口与兼容降级（已由 ADR-006 取代）
 
-右键菜单调用 `chrome.action.openPopup()`。若当前 Chromium 不允许该调用，则创建加载同一 `popup.html` 的小窗口。两种入口使用相同消息 API，不复制规则逻辑。
+初始方案由右键菜单打开 popup 或兼容小窗口。全屏页内界面确定后，此方案废止，当前行为以 ADR-006 为准。
 
 ## ADR-005：浏览器与页面边界
 
 首发最低版本暂定 Chrome 120。受限页面不尝试绕过平台限制；`file://` 不在 MVP 主动请求范围。PDF 是否可改名取决于浏览器查看器及注入权限，作为发布前手工兼容项保留。
+
+## ADR-006：页面内全屏命名界面
+
+工具栏图标、manifest command 和右键菜单统一由 background 调用 `openRenameOverlay(tabId)`，按需注入 content bundle。界面使用 closed Shadow DOM 与宿主页面隔离，但所有读写仍通过 background application service，content 不复制规则优先级或存储逻辑。受保护页面保持平台限制，不降级回扩展 popup。
+
+macOS 建议键声明为 `Command+Shift+R`。该组合也是 Chrome 硬刷新的保留快捷键，Chrome 可能不分配给扩展；引导页通过 `chrome.commands.getAll()` 展示实际分配结果，并提供快捷键设置入口。

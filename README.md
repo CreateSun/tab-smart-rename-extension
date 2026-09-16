@@ -1,6 +1,6 @@
 # Tab Rename
 
-一个本地优先、可预测的 Chromium 标签页重命名扩展。当前实现基于 `REQUIREMENTS.md` 的 MVP 基线。
+一个本地优先、可预测的 Chromium 标签页重命名扩展。点击工具栏图标或使用快捷键后，命名表单会以毛玻璃全屏层覆盖在当前网页上。当前实现基于 `REQUIREMENTS.md` 的 MVP 基线。
 
 ## 本地开发
 
@@ -20,3 +20,5 @@
 ## 已知平台限制
 
 `chrome://`、Chrome Web Store、新标签页、其他扩展页面等受保护页面无法注入。`file://` 取决于用户单独授予的文件 URL 权限；MVP 不主动请求。PDF 查看器行为取决于浏览器版本和查看器实现。
+
+macOS 清单建议使用 `Command+Shift+R`，但该组合与 Chrome 的硬刷新快捷键冲突，浏览器可能不会自动分配。安装引导页会展示 Chrome 实际分配结果，并提供 `chrome://extensions/shortcuts` 的检查入口。
