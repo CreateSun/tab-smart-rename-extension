@@ -1,5 +1,5 @@
 import { MAX_NAME_CODE_POINTS, type RenameRule } from "./types";
-import { normalizeExactUrl, normalizeHostname } from "./url";
+import { normalizeExactUrl, normalizeHostname, normalizeUrlPattern } from "./url";
 
 export function normalizeName(name: unknown): string {
   if (typeof name !== "string") throw new Error("名称必须是文本");
@@ -20,16 +20,23 @@ export function validateRule(input: unknown): RenameRule {
   if (!item.match || typeof item.match !== "object") throw new Error("规则 matcher 无效");
 
   const name = normalizeName(item.name);
+  // Rules saved before rule names were introduced keep a readable label.
+  const ruleName = normalizeName(item.ruleName ?? name);
   const match = item.match;
   if (match.kind === "exact-url") {
     const value = normalizeExactUrl(match.value);
     if (!value) throw new Error("精确 URL 无效");
-    return { id: item.id, name, match: { kind: "exact-url", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
+    return { id: item.id, ruleName, name, match: { kind: "exact-url", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
+  }
+  if (match.kind === "url-pattern") {
+    const value = normalizeUrlPattern(match.value);
+    if (!value) throw new Error("URL 正则无效");
+    return { id: item.id, ruleName, name, match: { kind: "url-pattern", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
   }
   if (match.kind === "host") {
     const value = normalizeHostname(match.value);
     if (!value || value.includes("/")) throw new Error("域名无效");
-    return { id: item.id, name, match: { kind: "host", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
+    return { id: item.id, ruleName, name, match: { kind: "host", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
   }
   throw new Error("不支持的 matcher 类型");
 }

@@ -76,9 +76,13 @@ export class TitleController {
     const observed = this.doc.title;
     if (observed !== this.targetTitle) this.originalTitle = observed;
     if (this.targetTitle === null || observed === this.targetTitle || this.timer !== null) return;
+    console.debug("[Tab Rename]", "external title change detected; scheduling reapply", { debounceMs: this.debounceMs });
     this.timer = window.setTimeout(() => {
       this.timer = null;
-      if (this.targetTitle !== null && this.doc.title !== this.targetTitle) this.write(this.targetTitle);
+      if (this.targetTitle !== null && this.doc.title !== this.targetTitle) {
+        console.debug("[Tab Rename]", "reapplying saved title");
+        this.write(this.targetTitle);
+      }
     }, this.debounceMs);
   }
 

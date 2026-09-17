@@ -13,11 +13,11 @@ export type TabSnapshot = {
 
 export type UiRequest =
   | { type: "GET_CURRENT" }
-  | { type: "SAVE_NAME"; name: string; mode: "page" | "tab" | "permanent"; scope?: "exact-url" | "host" }
+  | { type: "SAVE_NAME"; name: string; mode: "page" | "tab" | "permanent"; scope?: "exact-url" | "host"; traceId?: string }
   | { type: "RESTORE_ORIGINAL" }
   | { type: "SUPPRESS_RULE" }
   | { type: "LIST_STATE" }
-  | { type: "UPSERT_RULE"; rule: Partial<RenameRule> & Pick<RenameRule, "name" | "match"> }
+  | { type: "UPSERT_RULE"; rule: Partial<RenameRule> & Pick<RenameRule, "ruleName" | "name" | "match">; traceId?: string }
   | { type: "TOGGLE_RULE"; ruleId: string }
   | { type: "DELETE_RULE"; ruleId: string }
   | { type: "TOGGLE_HOST"; hostname: string }
@@ -25,7 +25,7 @@ export type UiRequest =
   | { type: "IMPORT_RULES"; json: string }
   | { type: "REQUEST_HOST_PERMISSION" }
   | { type: "COMPLETE_ONBOARDING" }
-  | { type: "OPEN_OPTIONS" };
+  | { type: "OPEN_OPTIONS"; newRule?: { title: string; url: string }; ruleId?: string };
 
 export type ContentRequest =
   | { type: "GET_PAGE_STATE" }

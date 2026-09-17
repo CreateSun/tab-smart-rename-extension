@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Tab Rename icon</title>
+  <desc id="desc">A browser tab with a renamed label, wrapped by a circular arrow.</desc>
+  <defs>
+    <linearGradient id="ground" x1="72" y1="55" x2="444" y2="468" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#238459"/>
+      <stop offset="1" stop-color="#0e4f33"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#082c1c" flood-opacity=".32"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#ground)"/>
+  <path d="M85 171C85 130 118 97 159 97H256L298 139H353C394 139 427 172 427 213V320C427 361 394 394 353 394H159C118 394 85 361 85 320V171Z" fill="#f7f2e7" filter="url(#shadow)"/>
+  <path d="M159 97H256L298 139H159C118 139 85 172 85 213V171C85 130 118 97 159 97Z" fill="#e7d9b9"/>
+  <rect x="127" y="198" width="238" height="124" rx="24" fill="#d9eadc"/>
+  <path d="M167 269.5H225" stroke="#176c45" stroke-width="21" stroke-linecap="round"/>
+  <path d="M209 234L244 269.5L209 305" fill="none" stroke="#176c45" stroke-width="21" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M342 210C353 229 358 250 356 272C352 325 309 366 256 366C211 366 172 337 159 296" fill="none" stroke="#e7aa4f" stroke-width="18" stroke-linecap="round"/>
+  <path d="M360 182L342 210L311 196" fill="none" stroke="#e7aa4f" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

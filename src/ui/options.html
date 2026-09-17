@@ -1,7 +1,37 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tab Rename · 管理</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="options.css"></head>
-<body><main class="options"><header><div><p class="eyebrow">TAB RENAME</p><h1>永久规则</h1><p>精确 URL 优先于域名规则；当前页面和当前标签命名始终优先。</p></div><button id="permission" class="secondary">授权自动应用</button></header>
+<body><main class="options"><header><div><p class="eyebrow">TAB RENAME</p><div class="title-row"><h1>永久规则</h1><button id="rule-help" class="help-button" type="button" aria-label="查看规则使用说明" aria-haspopup="dialog">?</button></div><p>精确 URL 优先于域名规则；当前页面和当前标签命名始终优先。</p></div><button id="permission" class="secondary">授权自动应用</button></header>
 <section class="toolbar"><input id="search" type="search" placeholder="搜索名称或 matcher" aria-label="搜索规则"><button id="add">新建规则</button></section>
 <p id="status" role="status"></p><div id="rules" class="rule-list"></div>
-<section><h2>站点暂停</h2><div id="paused"></div></section>
+<section><h2>站点暂停</h2><p class="section-note">暂停后，该站点的所有永久规则都不会自动改名；可在插件面板的“暂停此站点”创建记录。</p><div id="paused"></div></section>
 <section><h2>导入与导出</h2><div class="inline"><button id="export" class="secondary">导出 JSON</button><label class="button secondary">导入 JSON<input id="import" type="file" accept="application/json,.json" hidden></label></div></section>
-<footer>版本 0.1.0 · 数据只保存在本机 · <a href="PRIVACY.md" target="_blank">隐私说明</a></footer></main><script src="options.js"></script></body></html>
+<footer>版本 0.1.0 · 数据只保存在本机 · <a href="PRIVACY.md" target="_blank">隐私说明</a></footer></main>
+<div id="rule-dialog" class="rule-dialog-backdrop" hidden><section class="rule-dialog" role="dialog" aria-modal="true" aria-labelledby="rule-dialog-title">
+  <form id="rule-form" novalidate>
+    <header class="rule-dialog-header"><div><p class="eyebrow">// RULE_EDITOR</p><h2 id="rule-dialog-title">新建重命名规则</h2></div><button id="rule-close" class="icon-button" type="button" aria-label="关闭">×</button></header>
+    <input id="rule-id" type="hidden">
+    <label class="field-label" for="rule-kind">过滤类型</label>
+    <select id="rule-kind" name="kind"><option value="exact-url">精确 URL</option><option value="url-pattern">URL 正则（{1} / $1）</option><option value="host">域名</option></select>
+    <label class="field-label" for="rule-value">过滤内容</label>
+    <input id="rule-value" name="value" type="text" required autocomplete="off" placeholder="https://example.com/projects/42" aria-describedby="rule-pattern-help">
+    <small id="rule-pattern-help" class="rule-pattern-help">正则规则可使用捕获组；名称中的 $1 会替换为第一个捕获值。{1} 是单个路径段捕获的快捷写法。</small>
+    <label class="field-label" for="rule-label">规则名称</label>
+    <input id="rule-label" name="ruleLabel" type="text" required maxlength="100" autocomplete="off" placeholder="例如：Linear 任务页">
+    <label class="field-label" for="rule-name">新标签名称</label>
+    <input id="rule-name" name="name" type="text" required maxlength="100" autocomplete="off" placeholder="项目面板">
+    <p id="rule-preview" class="rule-preview" aria-live="polite"></p>
+    <p id="rule-error" class="error" role="alert"></p>
+    <div class="dialog-actions"><button id="rule-form-help" class="help-button form-help-button" type="button" aria-label="查看规则使用说明" aria-haspopup="dialog">?</button><span class="dialog-actions-spacer"></span><button id="rule-cancel" class="secondary" type="button">取消</button><button type="submit">创建规则 <kbd>↵</kbd></button></div>
+  </form>
+</section></div>
+<div id="rule-help-dialog" class="rule-dialog-backdrop" hidden><section class="rule-dialog rule-help-dialog" role="dialog" aria-modal="true" aria-labelledby="rule-help-title">
+  <header class="rule-dialog-header"><div><p class="eyebrow">RULE GUIDE</p><h2 id="rule-help-title">选择适合的规则</h2></div><button id="rule-help-close" class="icon-button" type="button" aria-label="关闭规则说明">×</button></header>
+  <p class="rule-help-intro">规则命中时，标签会自动使用“新标签名称”。选择最小匹配范围，结果会更可预测。</p>
+  <section class="rule-help-list">
+    <article><h3>精确 URL</h3><p>只匹配一个完整网址，适合固定页面。</p><dl><dt>规则</dt><dd><code>https://notion.so/acme/weekly-review</code></dd><dt>实际 URL</dt><dd><code>https://notion.so/acme/weekly-review</code></dd><dt>title 效果</dt><dd><code>本周复盘</code></dd></dl></article>
+    <article><h3>域名</h3><p>匹配该域名下所有页面，适合整站统一命名。</p><dl><dt>规则</dt><dd><code>github.com</code></dd><dt>实际 URL</dt><dd><code>https://github.com/acme/app/pulls</code></dd><dt>title 效果</dt><dd><code>GitHub 工作区</code></dd></dl></article>
+    <article><h3>URL 正则：花括号捕获</h3><p><code>{1}</code> 表示一个路径段；名称中的 <code>$1</code> 会替换为捕获到的内容。</p><dl><dt>规则</dt><dd><code>https://linear.app/acme/issue/{1}</code></dd><dt>实际 URL</dt><dd><code>https://linear.app/acme/issue/ENG-42</code></dd><dt>title 效果</dt><dd><code>任务 ENG-42</code>（名称填：<code>任务 $1</code>）</dd></dl></article>
+    <article><h3>URL 正则：通配内容</h3><p>使用正则 <code>.*</code> 匹配任意后续路径，适合整个栏目。</p><dl><dt>规则</dt><dd><code>https://docs.example.com/guides/.*</code></dd><dt>实际 URL</dt><dd><code>https://docs.example.com/guides/getting-started</code></dd><dt>title 效果</dt><dd><code>产品文档</code></dd></dl></article>
+    <article><h3>URL 正则：圆括号捕获</h3><p>圆括号可捕获更灵活的内容；使用 <code>$1</code> 写入名称。</p><dl><dt>规则</dt><dd><code>https://app.example.com/reports/(daily|weekly)</code></dd><dt>实际 URL</dt><dd><code>https://app.example.com/reports/weekly</code></dd><dt>title 效果</dt><dd><code>报告：weekly</code>（名称填：<code>报告：$1</code>）</dd></dl></article>
+  </section>
+  <div class="dialog-actions"><button id="rule-help-done" type="button">知道了</button></div>
+</section></div><script src="options.js"></script></body></html>

@@ -24,7 +24,34 @@ export function normalizeHostname(rawUrlOrHost: string): string | null {
   }
 }
 
-export function matcherKey(match: { kind: "exact-url" | "host"; value: string }): string {
+const captureReference = /\{([1-9][0-9]*)\}|\$([1-9][0-9]*)/g;
+
+export function normalizeUrlPattern(input: unknown): string | null {
+  if (typeof input !== "string") return null;
+  const pattern = input.trim();
+  if (!pattern || pattern.length > 2_048 || /[\r\n]/.test(pattern)) return null;
+  try { new RegExp("^(?:" + pattern.replace(/\{[1-9][0-9]*\}/g, "([^/?#]+)") + ")$"); return pattern; } catch { return null; }
+}
+
+export function matchUrlPattern(pattern: string, rawUrl: string): RegExpExecArray | null {
+  const normalizedUrl = normalizeExactUrl(rawUrl);
+  if (!normalizedUrl) return null;
+  try { return new RegExp("^(?:" + pattern.replace(/\{[1-9][0-9]*\}/g, "([^/?#]+)") + ")$").exec(normalizedUrl); } catch { return null; }
+}
+
+export function interpolateUrlPatternName(template: string, captures: RegExpExecArray): string {
+  return template.replace(captureReference, (token, braceIndex, dollarIndex) => {
+    const index = Number(braceIndex ?? dollarIndex);
+    const value = captures[index];
+    return value === undefined ? token : decodeUrlComponent(value);
+  });
+}
+
+function decodeUrlComponent(value: string): string {
+  try { return decodeURIComponent(value); } catch { return value; }
+}
+
+export function matcherKey(match: { kind: "exact-url" | "url-pattern" | "host"; value: string }): string {
   return `${match.kind}:${match.value}`;
 }
 

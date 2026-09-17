@@ -3,11 +3,13 @@ export const MAX_NAME_CODE_POINTS = 256;
 export const MAX_RULES = 5_000;
 
 export type ExactUrlMatch = { kind: "exact-url"; value: string };
+export type UrlPatternMatch = { kind: "url-pattern"; value: string };
 export type HostMatch = { kind: "host"; value: string };
-export type RuleMatch = ExactUrlMatch | HostMatch;
+export type RuleMatch = ExactUrlMatch | UrlPatternMatch | HostMatch;
 
 export type RenameRule = {
   id: string;
+  ruleName: string;
   name: string;
   match: RuleMatch;
   enabled: boolean;
@@ -33,6 +35,7 @@ export type EffectiveSource =
   | { kind: "page" }
   | { kind: "tab" }
   | { kind: "exact-url"; matcher: string; ruleId: string }
+  | { kind: "url-pattern"; matcher: string; ruleId: string }
   | { kind: "host"; matcher: string; ruleId: string }
   | { kind: "original" }
   | { kind: "paused" };

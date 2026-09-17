@@ -27,8 +27,40 @@ describe("rename overlay", () => {
     const overlay = new RenameOverlay();
     await overlay.open();
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
-    await vi.advanceTimersByTimeAsync(300);
+    await vi.advanceTimersByTimeAsync(130);
     expect(document.querySelector("#tab-smart-rename-overlay-host")).toBeNull();
     vi.useRealTimers();
   });
+
+  it("re-enables save when the background does not respond", async () => {
+    vi.useFakeTimers();
+    (chrome.runtime.sendMessage as unknown as ReturnType<typeof vi.fn>).mockImplementation((message: { type: string }) => {
+      if (message.type === "GET_CURRENT") return Promise.resolve({ ok: true, data: snapshot });
+      if (message.type === "SAVE_NAME") return new Promise(() => undefined);
+      return Promise.resolve({ ok: true });
+    });
+    const overlay = new RenameOverlay();
+    await overlay.open();
+    const privateOverlay = overlay as unknown as { shadow: ShadowRoot };
+    const form = privateOverlay.shadow.querySelector("form")!;
+    const submit = privateOverlay.shadow.querySelector<HTMLButtonElement>(".submit")!;
+    form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    expect(submit.textContent).toBe("正在保存…");
+    await vi.advanceTimersByTimeAsync(8_000);
+    expect(submit.disabled).toBe(false);
+    expect(submit.textContent).toBe("保存 ↵");
+    expect(privateOverlay.shadow.querySelector(".error")?.textContent).toBe("保存超时，请重试");
+    vi.useRealTimers();
+  });
+
+  it("opens the source rule in the options editor", async () => {
+    const ruleSnapshot = { ...snapshot, source: { kind: "url-pattern" as const, matcher: "https://example.com/.*", ruleId: "rule-42" } };
+    (chrome.runtime.sendMessage as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true, data: ruleSnapshot });
+    const overlay = new RenameOverlay();
+    await overlay.open();
+    const privateOverlay = overlay as unknown as { shadow: ShadowRoot };
+    (privateOverlay.shadow.querySelector(".source") as HTMLElement).click();
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: "OPEN_OPTIONS", ruleId: "rule-42" });
+  });
+
 });

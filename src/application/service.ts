@@ -49,14 +49,20 @@ async function refreshOpenTabs(): Promise<void> {
 }
 
 async function saveName(message: Extract<UiRequest, { type: "SAVE_NAME" }>): Promise<TabSnapshot> {
+  const traceId = message.traceId;
+  const log = (step: string, details: Record<string, unknown> = {}) => console.debug("[Tab Rename]", "save", step, { traceId, ...details });
+  log("started", { mode: message.mode, scope: message.scope });
   const tab = await activeTab();
+  log("active tab resolved", { tabId: tab.id });
   if (!tab.url || isRestrictedUrl(tab.url)) throw new Error("浏览器限制，无法修改此页面");
   const name = normalizeName(message.name);
   if (message.mode === "page") {
     await sendContent(tab.id!, { type: "SET_PAGE_OVERRIDE", name });
+    log("page override saved");
   } else if (message.mode === "tab") {
     await sendContent(tab.id!, { type: "SET_PAGE_OVERRIDE", name: null });
     await setTabOverride(tab.id!, name);
+    log("tab override saved");
   } else {
     const parsed = parseSupportedUrl(tab.url);
     if (!parsed) throw new Error("只有 http/https 页面可以创建永久规则");
@@ -67,21 +73,34 @@ async function saveName(message: Extract<UiRequest, { type: "SAVE_NAME" }>): Pro
     await updateStoredState((state) => {
       const existing = state.rules.find((rule) => rule.match.kind === match.kind && rule.match.value === match.value);
       if (existing) return { ...state, rules: state.rules.map((rule) => rule.id === existing.id ? { ...rule, name, enabled: true, updatedAt: now } : rule) };
-      return { ...state, rules: [...state.rules, { id: crypto.randomUUID(), name, match, enabled: true, createdAt: now, updatedAt: now }] };
+      return { ...state, rules: [...state.rules, { id: crypto.randomUUID(), ruleName: name, name, match, enabled: true, createdAt: now, updatedAt: now }] };
     });
+    log("permanent rule saved");
   }
-  await refreshOpenTabs();
-  return resolveTab(await chrome.tabs.get(tab.id!));
+  // The active tab has to respond before the overlay can close. Refreshing every
+  // other open tab is best-effort work, so it must not hold that response hostage.
+  void refreshOpenTabs().catch(() => undefined);
+  const snapshot = await resolveTab(await chrome.tabs.get(tab.id!));
+  log("completed", { source: snapshot.source.kind });
+  return snapshot;
 }
 
 async function mutateRule(message: Extract<UiRequest, { type: "UPSERT_RULE" }>): Promise<void> {
+  const traceId = message.traceId;
+  const log = (step: string, details: Record<string, unknown> = {}) => console.debug("[Tab Rename]", "rule save", step, { traceId, ...details });
+  log("started", { ruleId: message.rule.id, kind: message.rule.match.kind });
   const now = new Date().toISOString();
   await updateStoredState((state) => {
+    log("storage state loaded", { ruleCount: state.rules.length });
     const existing = message.rule.id ? state.rules.find((rule) => rule.id === message.rule.id) : state.rules.find((rule) => rule.match.kind === message.rule.match.kind && rule.match.value === message.rule.match.value);
-    const rule = validateRule({ id: existing?.id ?? crypto.randomUUID(), name: message.rule.name, match: message.rule.match, enabled: message.rule.enabled ?? existing?.enabled ?? true, createdAt: existing?.createdAt ?? now, updatedAt: now });
+    const rule = validateRule({ id: existing?.id ?? crypto.randomUUID(), ruleName: message.rule.ruleName, name: message.rule.name, match: message.rule.match, enabled: message.rule.enabled ?? existing?.enabled ?? true, createdAt: existing?.createdAt ?? now, updatedAt: now });
     return { ...state, rules: existing ? state.rules.map((item) => item.id === existing.id ? rule : item) : [...state.rules, rule] };
   });
-  await refreshOpenTabs();
+  log("storage write completed");
+  // Rule management must respond as soon as the local write succeeds. A page that
+  // does not answer its content-script message must not make the editor appear idle.
+  void refreshOpenTabs().catch(() => undefined);
+  log("completed; background refresh started");
 }
 
 export async function handleUiRequest(message: UiRequest): Promise<unknown> {
@@ -122,7 +141,13 @@ export async function handleUiRequest(message: UiRequest): Promise<unknown> {
   }
   if (message.type === "REQUEST_HOST_PERMISSION") return chrome.permissions.request({ origins: ["http://*/*", "https://*/*"] });
   if (message.type === "COMPLETE_ONBOARDING") return markOnboardingComplete();
-  if (message.type === "OPEN_OPTIONS") return chrome.runtime.openOptionsPage();
+  if (message.type === "OPEN_OPTIONS") {
+    if (!message.newRule && !message.ruleId) return chrome.runtime.openOptionsPage();
+    const parameters = new URLSearchParams();
+    if (message.newRule) { parameters.set("newRule", "1"); parameters.set("title", message.newRule.title); parameters.set("url", message.newRule.url); }
+    if (message.ruleId) parameters.set("ruleId", message.ruleId);
+    return chrome.tabs.create({ url: chrome.runtime.getURL("options.html?" + parameters) });
+  }
   return structuredClone(DEFAULT_STATE);
 }
 

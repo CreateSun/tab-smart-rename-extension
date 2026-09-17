@@ -16,6 +16,7 @@ for (const file of ["manifest.json", "src/ui/options.html", "src/ui/onboarding.h
   await cp(file, `${outdir}/${file.split("/").at(-1)}`);
 }
 await cp("_locales", `${outdir}/_locales`, { recursive: true });
+await cp("assets/icons", `${outdir}/icons`, { recursive: true });
 
 const options = { entryPoints, outdir, bundle: true, format: "iife", target: "chrome120", sourcemap: true, minify: !watch, logLevel: "info" };
 if (watch) {

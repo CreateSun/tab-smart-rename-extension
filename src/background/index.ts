@@ -1,9 +1,11 @@
 import { handleUiRequest, refreshOpenTabs, removeClosedTab, resolveTab } from "../application/service";
 import type { ContentEvent, UiRequest } from "../shared/messages";
+import { openOverlayOnPage } from "./open-overlay";
 
 const MENU_ID = "rename-tab";
 const AUTO_CONTENT_ID = "tab-rename-auto-content";
 const AUTO_ORIGINS = ["http://*/*", "https://*/*"];
+const LOG_PREFIX = "[Tab Rename]";
 
 async function syncAutomaticContentScript(): Promise<void> {
   const allowed = await chrome.permissions.contains({ origins: AUTO_ORIGINS });
@@ -19,16 +21,11 @@ async function openRenameOverlay(tabId?: number): Promise<void> {
   const tab = tabId ? await chrome.tabs.get(tabId) : (await chrome.tabs.query({ active: true, currentWindow: true }))[0];
   if (!tab?.id || !tab.url) return;
   try {
-    await chrome.tabs.sendMessage(tab.id, { type: "OPEN_RENAME_OVERLAY" });
+    await openOverlayOnPage(tab.id);
   } catch {
-    try {
-      await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["content.js"] });
-      await chrome.tabs.sendMessage(tab.id, { type: "OPEN_RENAME_OVERLAY" });
-    } catch {
-      await chrome.action.setBadgeBackgroundColor({ color: "#B42318", tabId: tab.id });
-      await chrome.action.setBadgeText({ text: "!", tabId: tab.id });
-      setTimeout(() => void chrome.action.setBadgeText({ text: "", tabId: tab.id }), 1800);
-    }
+    await chrome.action.setBadgeBackgroundColor({ color: "#B42318", tabId: tab.id });
+    await chrome.action.setBadgeText({ text: "!", tabId: tab.id });
+    setTimeout(() => void chrome.action.setBadgeText({ text: "", tabId: tab.id }), 1800);
   }
 }
 
@@ -53,7 +50,19 @@ chrome.runtime.onMessage.addListener((message: UiRequest | ContentEvent, sender,
     if (sender.tab?.id) chrome.tabs.get(sender.tab.id).then((tab) => resolveTab(tab)).catch(() => undefined);
     return false;
   }
-  handleUiRequest(message as UiRequest).then((data) => sendResponse({ ok: true, data })).catch((error) => sendResponse({ ok: false, error: error instanceof Error ? error.message : "操作失败" }));
+  const request = message as UiRequest;
+  const traceId = request.type === "SAVE_NAME" || request.type === "UPSERT_RULE" ? request.traceId : undefined;
+  const operation = request.type === "UPSERT_RULE" ? "rule save" : "save";
+  if (traceId) console.debug(LOG_PREFIX, `background received ${operation}`, { traceId, tabId: sender.tab?.id });
+  handleUiRequest(request)
+    .then((data) => {
+      if (traceId) console.debug(LOG_PREFIX, `background replied to ${operation}`, { traceId });
+      sendResponse({ ok: true, data });
+    })
+    .catch((error) => {
+      console.error(LOG_PREFIX, "background request failed", { traceId, type: request.type, error });
+      sendResponse({ ok: false, error: error instanceof Error ? error.message : "操作失败" });
+    });
   return true;
 });
 
