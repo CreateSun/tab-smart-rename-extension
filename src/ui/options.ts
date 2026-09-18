@@ -28,18 +28,30 @@ function render() {
   const query = ($("#search") as HTMLInputElement).value.toLowerCase();
   const rules = state.rules.filter((rule) => `${rule.ruleName} ${rule.name} ${rule.match.value}`.toLowerCase().includes(query));
   $("#rules").replaceChildren(...rules.map(ruleElement));
-  $("#paused").replaceChildren(...state.pausedHosts.map((host) => { const row = document.createElement("div"); row.className="paused-row"; row.textContent=host; const button=document.createElement("button"); button.className="secondary"; button.textContent="恢复"; button.onclick=async()=>{await request({type:"TOGGLE_HOST",hostname:host}); await load();}; row.append(button); return row; }));
   if (!rules.length) $("#rules").textContent = "没有匹配的规则。";
-  if (!state.pausedHosts.length) $("#paused").textContent = "当前没有暂停的站点。";
 }
 function ruleElement(rule: RenameRule) {
   const row=document.createElement("article"); row.className=`rule ${rule.enabled ? "" : "disabled"}`;
   const info=document.createElement("div"); const title=document.createElement("strong"); title.textContent=rule.ruleName; const renamed=document.createElement("small"); renamed.textContent=`标签名称：${rule.name}`; const meta=document.createElement("small"); const matchLabel=rule.match.kind === "host" ? "域名" : rule.match.kind === "url-pattern" ? "URL 正则" : "精确 URL"; meta.textContent=`${matchLabel} · ${rule.match.value} · ${new Date(rule.updatedAt).toLocaleString()}`; info.append(title,renamed,meta);
   const actions=document.createElement("div"); actions.className="inline";
-  const edit=button("编辑",()=>openRuleDialog(rule)), toggle=button(rule.enabled?"暂停":"启用",async()=>{await request({type:"TOGGLE_RULE",ruleId:rule.id}); await load();}), remove=button("删除",async()=>{if(confirm(`确定删除规则“${rule.name}”吗？`)){await request({type:"DELETE_RULE",ruleId:rule.id}); await load();}}); remove.classList.add("danger"); actions.append(edit,toggle,remove); row.append(info,actions); return row;
+  const edit=button("编辑",()=>openRuleDialog(rule));
+  const toggle=button(rule.enabled?"禁用":"启用",async()=>{
+    toggle.disabled = true;
+    await request({type:"TOGGLE_RULE",ruleId:rule.id}); await load();
+  });
+  const remove=button("删除",async()=>{
+    if(!confirm(`确定删除规则「${rule.name}」吗?`)) return;
+    remove.disabled = true;
+    await request({type:"DELETE_RULE",ruleId:rule.id}); await load();
+  });
+  remove.classList.add("danger"); actions.append(edit,toggle,remove); row.append(info,actions); return row;
 }
 function button(label:string,onClick:()=>void){const value=document.createElement("button");value.type="button";value.className="secondary";value.textContent=label;value.onclick=onClick;return value;}
 function updateRuleFields() {
+  const value = ruleValue.value;
+  if (value && ruleKind.value !== "host" && /\{[1-9][0-9]*\}/.test(value) && ruleKind.value !== "url-pattern") {
+    ruleKind.value = "url-pattern";
+  }
   const host = ruleKind.value === "host";
   const pattern = ruleKind.value === "url-pattern";
   ruleValue.placeholder = host ? "example.com" : pattern ? "https://captain.release.ctripcorp.com/app/{1}/.*" : "https://example.com/projects/42";
