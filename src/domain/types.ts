@@ -20,7 +20,6 @@ export type RenameRule = {
 export type StoredStateV1 = {
   schemaVersion: typeof SCHEMA_VERSION;
   rules: RenameRule[];
-  pausedHosts: string[];
   settings: { guardDebounceMs: number; onboardingCompleted: boolean };
 };
 
@@ -37,14 +36,12 @@ export type EffectiveSource =
   | { kind: "exact-url"; matcher: string; ruleId: string }
   | { kind: "url-pattern"; matcher: string; ruleId: string }
   | { kind: "host"; matcher: string; ruleId: string }
-  | { kind: "original" }
-  | { kind: "paused" };
+  | { kind: "original" };
 
 export type Resolution = { name: string | null; source: EffectiveSource };
 
 export const DEFAULT_STATE: StoredStateV1 = {
   schemaVersion: SCHEMA_VERSION,
   rules: [],
-  pausedHosts: [],
   settings: { guardDebounceMs: 150, onboardingCompleted: false }
 };

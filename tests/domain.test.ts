@@ -4,7 +4,7 @@ import type { RenameRule } from "../src/domain/types";
 import { normalizeExactUrl, normalizeHostname } from "../src/domain/url";
 
 const rule = (kind: "exact-url" | "url-pattern" | "host", value: string, name: string, updatedAt = "2026-09-16T00:00:00.000Z", enabled = true): RenameRule => ({ id: `${kind}-${name}`, ruleName: name, name, match: { kind, value } as RenameRule["match"], enabled, createdAt: updatedAt, updatedAt });
-const base = { rawUrl: "https://example.com/work?a=1#part", originalTitle: "Original", rules: [] as RenameRule[], pausedHosts: [] as string[] };
+const base = { rawUrl: "https://example.com/work?a=1#part", originalTitle: "Original", rules: [] as RenameRule[] };
 
 describe("URL normalization", () => {
   it("removes fragments while preserving path and query", () => expect(normalizeExactUrl(base.rawUrl)).toBe("https://example.com/work?a=1"));
@@ -25,19 +25,34 @@ describe("effective name resolver", () => {
     expect(resolveEffectiveName({ ...base, rules }).name).toBe("Host");
   });
   it("uses URL regex captures in a name template", () => {
-    const rules = [rule("url-pattern", "https://captain\\.release\\.ctripcorp\\.com/app/{1}/.*", "{1}")];
+    const rules = [rule("url-pattern", "https://captain.release.ctripcorp.com/app/{1}/*", "{1}")];
     const result = resolveEffectiveName({ ...base, rawUrl: "https://captain.release.ctripcorp.com/app/platform/deployments", rules });
     expect(result.name).toBe("platform");
+    expect(result.source.kind).toBe("url-pattern");
+  });
+  it("escapes URL special chars in {n} patterns (query strings)", () => {
+    const rules = [rule("url-pattern", "https://iquality.ctripcorp.com/feedback/feedbackForMeHandle?pid={1}&v={2}", "IQ-$1-$2")];
+    const result = resolveEffectiveName({ ...base, rawUrl: "https://iquality.ctripcorp.com/feedback/feedbackForMeHandle?pid=7&v=1789613231843", rules });
+    expect(result.name).toBe("IQ-7-1789613231843");
     expect(result.source.kind).toBe("url-pattern");
   });
   it("supports standard regex capture groups and dollar templates", () => {
     const rules = [rule("url-pattern", "https://example\\.com/projects/([^/]+)(?:/.*)?", "Project: " + "\$1")];
     expect(resolveEffectiveName({ ...base, rawUrl: "https://example.com/projects/alpha/issues", rules }).name).toBe("Project: alpha");
   });
-  it("selects the most recently updated duplicate and honors pause/suppress", () => {
-    const rules = [rule("host", "example.com", "Old"), rule("host", "example.com", "New", "2026-09-17T00:00:00.000Z")];
-    expect(resolveEffectiveName({ ...base, rules }).name).toBe("New");
+  it("uses first matching rule among duplicates and honors suppress", () => {
+    const rules = [rule("host", "example.com", "First"), rule("host", "example.com", "Second", "2026-09-17T00:00:00.000Z")];
+    expect(resolveEffectiveName({ ...base, rules }).name).toBe("First");
     expect(resolveEffectiveName({ ...base, rules, pageOverride: { kind: "suppress" } }).source.kind).toBe("original");
-    expect(resolveEffectiveName({ ...base, rules, pausedHosts: ["example.com"], pageOverride: { kind: "name", name: "Page" } }).source.kind).toBe("paused");
+  });
+  it("follows priority: exact-url > url-pattern > host", () => {
+    const rules = [
+      rule("host", "example.com", "Host"),
+      rule("url-pattern", "https://example.com/work?a={1}", "Pattern-$1"),
+      rule("exact-url", "https://example.com/work?a=1", "Exact"),
+    ];
+    expect(resolveEffectiveName({ ...base, rules }).name).toBe("Exact");
+    expect(resolveEffectiveName({ ...base, rawUrl: "https://example.com/work?a=2", rules }).name).toBe("Pattern-2");
+    expect(resolveEffectiveName({ ...base, rawUrl: "https://example.com/other", rules }).name).toBe("Host");
   });
 });

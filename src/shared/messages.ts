@@ -8,7 +8,6 @@ export type TabSnapshot = {
   effectiveName: string;
   source: EffectiveSource;
   restricted: boolean;
-  paused: boolean;
 };
 
 export type UiRequest =
@@ -20,7 +19,6 @@ export type UiRequest =
   | { type: "UPSERT_RULE"; rule: Partial<RenameRule> & Pick<RenameRule, "ruleName" | "name" | "match">; traceId?: string }
   | { type: "TOGGLE_RULE"; ruleId: string }
   | { type: "DELETE_RULE"; ruleId: string }
-  | { type: "TOGGLE_HOST"; hostname: string }
   | { type: "EXPORT_RULES" }
   | { type: "IMPORT_RULES"; json: string }
   | { type: "REQUEST_HOST_PERMISSION" }

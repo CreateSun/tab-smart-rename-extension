@@ -1,5 +1,4 @@
 import { DEFAULT_STATE, MAX_RULES, SCHEMA_VERSION, type RenameRule, type SessionState, type StoredStateV1 } from "../domain/types";
-import { normalizeHostname } from "../domain/url";
 import { validateRule } from "../domain/validation";
 
 const LOCAL_KEY = "storedState";
@@ -9,13 +8,11 @@ function validateStoredState(value: unknown): StoredStateV1 {
   if (!value || typeof value !== "object") return structuredClone(DEFAULT_STATE);
   const state = value as Partial<StoredStateV1>;
   if (state.schemaVersion !== SCHEMA_VERSION) throw new Error("存储版本不受支持，请先导出数据后重试");
-  if (!Array.isArray(state.rules) || !Array.isArray(state.pausedHosts) || !state.settings) throw new Error("本地存储结构无效");
+  if (!Array.isArray(state.rules) || !state.settings) throw new Error("本地存储结构无效");
   if (state.rules.length > MAX_RULES) throw new Error("规则数量超过上限");
-  const pausedHosts = state.pausedHosts.map((host) => normalizeHostname(host)).filter((host): host is string => Boolean(host));
   return {
     schemaVersion: SCHEMA_VERSION,
     rules: state.rules.map(validateRule),
-    pausedHosts: [...new Set(pausedHosts)],
     settings: {
       guardDebounceMs: typeof state.settings.guardDebounceMs === "number" ? Math.min(250, Math.max(100, state.settings.guardDebounceMs)) : 150,
       onboardingCompleted: state.settings.onboardingCompleted === true

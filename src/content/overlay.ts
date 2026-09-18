@@ -50,6 +50,7 @@ export class RenameOverlay {
   private bind(): void {
     const root = this.shadow!;
     root.querySelector(".close")?.addEventListener("click", () => this.close());
+    root.querySelector(".backdrop")?.addEventListener("click", () => this.close());
     root.querySelector(".manage")?.addEventListener("click", () => void this.request({ type: "OPEN_OPTIONS" }));
     root.querySelector(".new-rule")?.addEventListener("click", () => {
       if (!this.snapshot) return;
@@ -79,7 +80,7 @@ export class RenameOverlay {
     if (this.snapshot.restricted) { this.showError(new Error("浏览器限制，无法修改此页面")); return; }
     this.shadow.querySelector<HTMLElement>("form")!.hidden = false;
     const source = this.snapshot.source;
-    const labels = { page: "仅当前页面命名", tab: "当前标签命名", "exact-url": "来自精确 URL 规则", "url-pattern": "来自 URL 模式规则", host: "来自域名规则", original: "页面原标题", paused: "此站点已暂停" };
+    const labels = { page: "仅当前页面命名", tab: "当前标签命名", "exact-url": "来自精确 URL 规则", "url-pattern": "来自 URL 模式规则", host: "来自域名规则", original: "页面原标题" };
     const sourceElement = this.shadow.querySelector<HTMLElement>(".source")!;
     sourceElement.textContent = labels[source.kind];
     const hasRule = "ruleId" in source;
@@ -88,7 +89,7 @@ export class RenameOverlay {
     sourceElement.setAttribute("tabindex", hasRule ? "0" : "-1");
     sourceElement.setAttribute("title", hasRule ? "点击编辑这条规则" : "");
     const restore = this.shadow.querySelector<HTMLButtonElement>(".restore")!;
-    restore.textContent = source.kind === "paused" ? "恢复此站点" : hasRule ? "暂停此站点" : "恢复原标题";
+    restore.textContent = "恢复原标题";
     const original = this.shadow.querySelector<HTMLElement>(".original")!;
     original.textContent = this.snapshot.originalTitle || "（无标题）";
     original.title = this.snapshot.originalTitle;
@@ -126,9 +127,7 @@ export class RenameOverlay {
   private async restore(): Promise<void> {
     if (!this.snapshot) return;
     try {
-      if (this.snapshot.source.kind === "exact-url" || this.snapshot.source.kind === "url-pattern" || this.snapshot.source.kind === "host" || this.snapshot.source.kind === "paused") {
-        await this.request({ type: "TOGGLE_HOST", hostname: this.snapshot.hostname! });
-      } else await this.request({ type: "RESTORE_ORIGINAL" });
+      await this.request({ type: "RESTORE_ORIGINAL" });
       this.close();
     } catch (error) { this.showError(error); }
   }
@@ -176,7 +175,7 @@ const MARKUP = `
       </div></fieldset>
       <fieldset class="scope" hidden><legend>MATCH</legend><div class="scope-options"><label><input type="radio" name="scope" value="exact-url" checked> exact URL</label><label><input type="radio" name="scope" value="host"> hostname</label></div></fieldset>
       <p class="error" role="alert"></p>
-      <footer><div class="rule-actions"><button class="manage ghost" type="button">管理规则</button><button class="new-rule ghost" type="button">新建规则</button></div><div><button class="restore ghost" type="button">暂停此站点</button><button class="submit" type="submit">保存 <span>↵</span></button></div></footer>
+      <footer><div class="rule-actions"><button class="manage ghost" type="button">管理规则</button><button class="new-rule ghost" type="button">新建规则</button></div><div><button class="restore ghost" type="button">恢复原标题</button><button class="submit" type="submit">保存 <span>↵</span></button></div></footer>
     </form>
   </section>
 </div>`;

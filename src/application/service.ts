@@ -32,14 +32,14 @@ export async function resolveTab(tab: chrome.tabs.Tab, providedState?: StoredSta
   const state = providedState ?? await readStoredState();
   const rawUrl = tab.url ?? "";
   const restricted = isRestrictedUrl(rawUrl);
-  if (restricted) return { tabId: tab.id!, url: rawUrl, hostname: null, originalTitle: tab.title ?? "", effectiveName: tab.title ?? "", source: { kind: "original" }, restricted: true, paused: false };
+  if (restricted) return { tabId: tab.id!, url: rawUrl, hostname: null, originalTitle: tab.title ?? "", effectiveName: tab.title ?? "", source: { kind: "original" }, restricted: true };
   const content = await pageState(tab);
   const session = await readSessionState();
   const pageOverride: PageOverride | null = content.pageOverride ?? null;
-  const resolution = resolveEffectiveName({ rawUrl, originalTitle: content.originalTitle, pageOverride, tabOverride: session.tabOverrides[String(tab.id!)] ?? null, rules: state.rules, pausedHosts: state.pausedHosts });
-  await sendContent(tab.id!, { type: "APPLY_DECISION", name: resolution.source.kind === "original" || resolution.source.kind === "paused" ? null : resolution.name, debounceMs: state.settings.guardDebounceMs });
+  const resolution = resolveEffectiveName({ rawUrl, originalTitle: content.originalTitle, pageOverride, tabOverride: session.tabOverrides[String(tab.id!)] ?? null, rules: state.rules });
+  await sendContent(tab.id!, { type: "APPLY_DECISION", name: resolution.source.kind === "original" ? null : resolution.name, debounceMs: state.settings.guardDebounceMs });
   const hostname = parseSupportedUrl(rawUrl)?.hostname.toLowerCase() ?? null;
-  return { tabId: tab.id!, url: rawUrl, hostname, originalTitle: content.originalTitle, effectiveName: resolution.name ?? content.originalTitle, source: resolution.source, restricted: false, paused: hostname ? state.pausedHosts.includes(hostname) : false };
+  return { tabId: tab.id!, url: rawUrl, hostname, originalTitle: content.originalTitle, effectiveName: resolution.name ?? content.originalTitle, source: resolution.source, restricted: false };
 }
 
 async function refreshOpenTabs(): Promise<void> {
@@ -120,15 +120,13 @@ export async function handleUiRequest(message: UiRequest): Promise<unknown> {
   if (message.type === "UPSERT_RULE") return mutateRule(message);
   if (message.type === "TOGGLE_RULE") {
     await updateStoredState((state) => ({ ...state, rules: state.rules.map((rule) => rule.id === message.ruleId ? { ...rule, enabled: !rule.enabled, updatedAt: new Date().toISOString() } : rule) }));
-    return refreshOpenTabs();
+    void refreshOpenTabs();
+    return;
   }
   if (message.type === "DELETE_RULE") {
     await updateStoredState((state) => ({ ...state, rules: state.rules.filter((rule) => rule.id !== message.ruleId) }));
-    return refreshOpenTabs();
-  }
-  if (message.type === "TOGGLE_HOST") {
-    await updateStoredState((state) => ({ ...state, pausedHosts: state.pausedHosts.includes(message.hostname) ? state.pausedHosts.filter((host) => host !== message.hostname) : [...state.pausedHosts, message.hostname] }));
-    return refreshOpenTabs();
+    void refreshOpenTabs();
+    return;
   }
   if (message.type === "EXPORT_RULES") return exportRules();
   if (message.type === "IMPORT_RULES") {

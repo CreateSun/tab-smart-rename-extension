@@ -1,8 +1,7 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tab Rename · 管理</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="options.css"></head>
-<body><main class="options"><header><div><p class="eyebrow">TAB RENAME</p><div class="title-row"><h1>永久规则</h1><button id="rule-help" class="help-button" type="button" aria-label="查看规则使用说明" aria-haspopup="dialog">?</button></div><p>精确 URL 优先于域名规则；当前页面和当前标签命名始终优先。</p></div><button id="permission" class="secondary">授权自动应用</button></header>
+<body><main class="options"><header><div><p class="eyebrow">TAB RENAME</p><div class="title-row"><h1>永久规则</h1><button id="rule-help" class="help-button" type="button" aria-label="查看规则使用说明" aria-haspopup="dialog">?</button></div><p>精确 URL 优先于域名规则；当前页面和当前标签命名始终优先。</p></div><div class="permission-wrap"><button id="permission" class="secondary">授权自动应用</button><span class="tip-wrap"><button class="help-button" type="button" aria-label="授权说明">?</button><span class="tip" role="tooltip">授权后，永久规则可在所有网站上自动生效，无需手动触发</span></span></div></header>
 <section class="toolbar"><input id="search" type="search" placeholder="搜索名称或 matcher" aria-label="搜索规则"><button id="add">新建规则</button></section>
 <p id="status" role="status"></p><div id="rules" class="rule-list"></div>
-<section><h2>站点暂停</h2><p class="section-note">暂停后，该站点的所有永久规则都不会自动改名；可在插件面板的“暂停此站点”创建记录。</p><div id="paused"></div></section>
 <section><h2>导入与导出</h2><div class="inline"><button id="export" class="secondary">导出 JSON</button><label class="button secondary">导入 JSON<input id="import" type="file" accept="application/json,.json" hidden></label></div></section>
 <footer>版本 0.1.0 · 数据只保存在本机 · <a href="PRIVACY.md" target="_blank">隐私说明</a></footer></main>
 <div id="rule-dialog" class="rule-dialog-backdrop" hidden><section class="rule-dialog" role="dialog" aria-modal="true" aria-labelledby="rule-dialog-title">
