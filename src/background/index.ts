@@ -32,6 +32,7 @@ async function openRenameOverlay(tabId?: number): Promise<void> {
 chrome.runtime.onInstalled.addListener((details) => {
   chrome.contextMenus.removeAll().then(() => chrome.contextMenus.create({ id: MENU_ID, title: "重命名此标签页…", contexts: ["page"] }));
   if (details.reason === "install") chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
+  chrome.runtime.setUninstallURL("https://tally.so/r/obJD4x");
   void syncAutomaticContentScript();
 });
 chrome.runtime.onStartup.addListener(() => { void syncAutomaticContentScript(); });
