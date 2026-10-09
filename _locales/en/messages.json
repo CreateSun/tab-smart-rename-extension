@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Tab Rename" },
-  "extensionDescription": { "message": "A local-first, predictable tab renaming tool" },
+  "extensionName": { "message": "Tab Rename - Predictable Tab Titles" },
+  "extensionDescription": { "message": "Spot the right doc, issue, or dashboard fast. Rename this page, this tab session, or every matching URL—locally." },
   "openPopup": { "message": "Rename the current tab" }
 }

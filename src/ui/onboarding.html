@@ -1,20 +1,32 @@
 <!doctype html>
-<html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>欢迎使用 Tab Rename</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="onboarding.css"></head>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tab Rename</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="onboarding.css"></head>
 <body class="welcome-page">
   <main class="welcome">
-    <nav><span class="brand-mark">R</span><strong>Tab Smart Rename</strong><span class="local-pill">只在本机运行</span></nav>
+    <nav><img class="brand-mark" src="icons/icon-32.png" alt=""><strong>Tab Rename</strong><span class="local-pill" id="localOnly">Runs locally</span><div id="language-toggle" class="language-toggle" role="group" aria-label="Language"><button type="button" data-language="en" aria-pressed="true">EN</button><button type="button" data-language="zh_CN" aria-pressed="false">中文</button></div></nav>
     <section class="hero">
-      <p class="eyebrow">安装完成</p><h1>给每个标签，<br>一个一眼认出的名字。</h1>
-      <p class="lead">在任意普通网页呼出全屏命名界面。没有拥挤的小窗口，也没有上传数据。</p>
-      <div class="shortcut-card"><div><span>最快打开方式</span><strong id="shortcutLabel">⇧ ⌘ R</strong></div><button id="checkShortcut" class="secondary">检查快捷键</button></div>
-      <p id="shortcutStatus" class="shortcut-status" role="status">macOS 默认建议使用 ⇧ + ⌘ + R；Chrome 若将其保留为硬刷新，请在快捷键页重新确认或分配。</p>
+      <p class="eyebrow" id="installed">Installation complete</p><h1 id="headline">Rename every tab,<br>at a glance.</h1>
+      <p class="lead" id="lead">Open a full-screen rename overlay on any regular webpage. No cramped popup and no data uploads.</p><p id="webpageTip" class="webpage-tip"></p>
+      <div class="shortcut-card"><div><span id="shortcutFastest">Fastest way to open</span><strong id="shortcutLabel">—</strong></div><button id="checkShortcut" class="secondary">Open keyboard shortcuts</button></div>
+      <p id="shortcutStatus" class="shortcut-status" role="status"></p><button id="googleTest" class="secondary google-test" type="button"></button>
     </section>
-    <section class="steps" aria-label="使用步骤">
-      <article><span>01</span><div><strong>呼出界面</strong><p>按快捷键，或点击浏览器工具栏中的扩展图标。</p></div></article>
-      <article><span>02</span><div><strong>输入名称</strong><p>输入后选择只保留在这一页、这个标签，或建立永久规则。</p></div></article>
-      <article><span>03</span><div><strong>回到工作</strong><p>按 Enter 保存，按 Esc 随时关闭。动态网页也会保持你的名称。</p></div></article>
+    <section class="demo" aria-labelledby="demoTitle">
+      <div class="demo-copy"><p class="eyebrow" id="demoEyebrow">A quick look</p><h2 id="demoTitle">Rename and restore in a few seconds</h2><p id="demoHelp">Open TAB_RENAME, choose a name and emoji, save, or restore the original title.</p></div>
+      <div class="demo-stage" data-demo="rename-flow" role="img" aria-labelledby="demoTitle" aria-describedby="demoAlt">
+        <span class="demo-a11y" id="demoAlt">A local animated preview of the extension: open TAB_RENAME, enter a name, choose an emoji, save the change, then restore the original title.</span>
+        <div class="demo-browser"><div class="demo-tabs"><span class="demo-tab"><span class="demo-tab-icon"><img class="demo-favicon" src="onboarding/demo-original-favicon.svg" alt=""><i>⭐</i></span><b><span class="demo-title-original" id="demoTabOriginal">Inbox — Mail</span><span class="demo-title-renamed" id="demoTabRenamed">Project follow-up</span></b></span><span class="demo-tab muted"><i>▰</i></span><span class="demo-new-tab">+</span></div><div class="demo-address"><span>◈</span><span>mail.example.test</span><span class="demo-extension">✳</span></div><div class="demo-webpage"><div class="demo-toolbar"><span>MAIL</span><span>Search messages</span></div><div class="demo-mail-lines"><i></i><i></i><i></i><i></i></div></div></div>
+        <div class="demo-overlay"><div class="demo-overlay-head"><span>// TAB_RENAME</span><b id="demoOverlayTitle">Rename this tab</b><span class="demo-esc">ESC ×</span></div><div class="demo-input-label" id="demoNameLabel">NAME</div><div class="demo-name-row"><span class="demo-selected-emoji">⭐</span><span class="demo-name" id="demoName"><span class="demo-input-original" id="demoInputOriginal">Inbox — Mail</span><span class="demo-input-renamed" id="demoInputRenamed">Project follow-up</span></span></div><div class="demo-original"><span class="demo-source" id="demoSource">NAMED FOR THIS TAB</span><span id="demoOriginal">Inbox — Mail</span></div><div class="demo-persistence"><small id="demoPersistence">PERSISTENCE</small><span id="demoScope">This tab</span></div><div class="demo-emoji-list" aria-hidden="true"><span>📌</span><span>🔥</span><span class="chosen">⭐</span><span>📚</span><span>🧪</span></div><div class="demo-actions"><span class="demo-restore" id="demoRestore">Restore original title</span><span class="demo-save" id="demoSave">Save ↵</span></div><div class="demo-status" id="demoStatus">Name updated</div></div>
+        <div class="demo-cursor" aria-hidden="true">↖</div>
+      </div>
     </section>
-    <footer><p>受保护页面无法修改 · 默认不请求全站权限 · 无网络请求与遥测</p><button id="start">开始使用 <span>→</span></button></footer>
+    <section aria-labelledby="stepsTitle">
+      <h2 class="steps-title" id="stepsTitle">How to use</h2>
+      <div class="steps" id="steps" aria-label="How to use">
+      <article><span>01</span><div><strong id="step1">Open the rename overlay</strong><p id="step1Help">Use the shortcut or the extension menu on any webpage.</p></div></article>
+      <article><span>02</span><div><strong id="step2">Enter a name</strong><p id="step2Help">Keep it on this page, this tab, or create a permanent rule.</p></div></article>
+      <article><span>03</span><div><strong id="step3">Get back to work</strong><p id="step3Help">Press Enter to save and Esc to close. Dynamic pages keep your name.</p></div></article>
+      </div>
+    </section>
+    <footer><p id="privacyNote">Protected pages cannot be changed · No broad permissions by default · No network requests or telemetry</p><button id="start">Continue <span>→</span></button></footer>
   </main><script src="onboarding.js"></script>
 </body></html>

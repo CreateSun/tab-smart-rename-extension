@@ -1,8 +1,9 @@
 import { handleUiRequest, refreshOpenTabs, removeClosedTab, resolveTab } from "../application/service";
 import type { ContentEvent, UiRequest } from "../shared/messages";
 import { openOverlayOnPage } from "./open-overlay";
-
-const MENU_ID = "rename-tab";
+import { readStoredState } from "../storage/state";
+import { translate } from "../shared/i18n";
+import { handleContextMenuClick, refreshContextMenu } from "./context-menus";
 const AUTO_CONTENT_ID = "tab-rename-auto-content";
 const AUTO_ORIGINS = ["http://*/*", "https://*/*"];
 const LOG_PREFIX = "[Tab Rename]";
@@ -30,19 +31,19 @@ async function openRenameOverlay(tabId?: number): Promise<void> {
 }
 
 chrome.runtime.onInstalled.addListener((details) => {
-  chrome.contextMenus.removeAll().then(() => chrome.contextMenus.create({ id: MENU_ID, title: "重命名此标签页…", contexts: ["page"] }));
+  void refreshContextMenu();
   if (details.reason === "install") chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
+  chrome.runtime.setUninstallURL("https://tally.so/r/obJD4x");
   void syncAutomaticContentScript();
 });
-chrome.runtime.onStartup.addListener(() => { void syncAutomaticContentScript(); });
+chrome.runtime.onStartup.addListener(() => { void syncAutomaticContentScript(); void refreshContextMenu(); });
 chrome.permissions.onAdded.addListener(() => { void syncAutomaticContentScript().then(() => refreshOpenTabs()); });
 chrome.permissions.onRemoved.addListener(() => { void syncAutomaticContentScript().then(() => refreshOpenTabs()); });
 chrome.action.onClicked.addListener((tab) => { void openRenameOverlay(tab.id); });
 chrome.commands.onCommand.addListener((command) => { if (command === "_execute_action") void openRenameOverlay(); });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId !== MENU_ID) return;
-  await openRenameOverlay(tab?.id);
+  await handleContextMenuClick(info.menuItemId, tab?.id, openRenameOverlay);
 });
 
 chrome.runtime.onMessage.addListener((message: UiRequest | ContentEvent, sender, sendResponse) => {
@@ -55,13 +56,15 @@ chrome.runtime.onMessage.addListener((message: UiRequest | ContentEvent, sender,
   const operation = request.type === "UPSERT_RULE" ? "rule save" : "save";
   if (traceId) console.debug(LOG_PREFIX, `background received ${operation}`, { traceId, tabId: sender.tab?.id });
   handleUiRequest(request)
-    .then((data) => {
+    .then(async (data) => {
+      if (request.type === "SET_LANGUAGE") await refreshContextMenu();
       if (traceId) console.debug(LOG_PREFIX, `background replied to ${operation}`, { traceId });
       sendResponse({ ok: true, data });
     })
-    .catch((error) => {
+    .catch(async (error) => {
       console.error(LOG_PREFIX, "background request failed", { traceId, type: request.type, error });
-      sendResponse({ ok: false, error: error instanceof Error ? error.message : "操作失败" });
+      const language = await readStoredState().then((state) => state.settings.language).catch(() => "en" as const);
+      sendResponse({ ok: false, error: error instanceof Error ? error.message : translate(language, "common.operationFailed") });
     });
   return true;
 });
@@ -72,3 +75,4 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 });
 chrome.runtime.onMessageExternal?.addListener?.((_message, _sender, sendResponse) => { sendResponse(false); });
 void syncAutomaticContentScript();
+void refreshContextMenu();

@@ -1,0 +1,94 @@
+{
+  "capturedAt": "2026-09-29T16:33:23.214Z",
+  "browser": "151.0.7922.34",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "deviceScaleFactor": 1,
+  "locales": [
+    "en",
+    "zh_CN"
+  ],
+  "mode": "real-unpacked-extension-plus-illustrative-before-after",
+  "harnessDifference": "Temporary copy of manifest adds http://127.0.0.1/* host access only, to open the actual content overlay on a local example page.",
+  "checks": {
+    "switchPersisted": true,
+    "renameChangedDocumentTitle": true,
+    "patternTests": {
+      "en": "Matched. Final tab name: Issue ENG-42",
+      "zh_CN": "已命中。最终标签名： 工单 ENG-42"
+    },
+    "promoTextBounds": [
+      {
+        "text": "Tab Rename",
+        "x": 174,
+        "y": 58,
+        "right": 398.75,
+        "bottom": 97.5
+      },
+      {
+        "text": "Find the right tab. Fast.",
+        "x": 174,
+        "y": 109.5,
+        "right": 338.5234375,
+        "bottom": 127.5
+      },
+      {
+        "text": "DOCS  ·  ISSUES  ·  DASHBOARDS",
+        "x": 174,
+        "y": 163.5,
+        "right": 366.671875,
+        "bottom": 175
+      }
+    ],
+    "marqueeTextBounds": [
+      {
+        "text": "TAB RENAME",
+        "x": 128,
+        "y": 157.5,
+        "right": 263.4765625,
+        "bottom": 175.5
+      },
+      {
+        "text": "Find the right tab.",
+        "x": 128,
+        "y": 196.5,
+        "right": 740.6640625,
+        "bottom": 271.5
+      },
+      {
+        "text": "Stay in the flow.",
+        "x": 128,
+        "y": 273.5,
+        "right": 670.6953125,
+        "bottom": 348.5
+      },
+      {
+        "text": "Predictable names for docs, issues and dashboards",
+        "x": 132,
+        "y": 375,
+        "right": 637.0703125,
+        "bottom": 399.5
+      },
+      {
+        "text": "LOCAL-FIRST · NO TRACKING",
+        "x": 153,
+        "y": 447.5,
+        "right": 372.140625,
+        "bottom": 464
+      }
+    ]
+  },
+  "buildSha256": {
+    "background.js": "e62e2f421bfca82224d2e5c46674252c2cf692167b9b9bc518619f3a79fc297e",
+    "content.js": "ae6bb96dbe2c51cf68d5fbbdd731f1196af72a97952660c108c6e2df0250d47e",
+    "onboarding.css": "321b584a36d79ce31340b64001e65954544a2879a88dddc4329eea15133a143e",
+    "onboarding.html": "a5db39cdc19c8b6ed5a7943fb6e55988ca06812a67dad33b51995e16e629a1bd",
+    "onboarding.js": "f796e2942efc7dfa846def8cac8d4aea2e595ae66214fcd6caf1119857c2a193",
+    "options.css": "1086ff1d17c9c74b1c967a16d8706d977de553802a6d0d78f23b298ab9d5bd75",
+    "options.html": "81fa7392aa17ee786c0f1fb60e7c6370f3e181e030d17d06316e36c376166260",
+    "options.js": "8f01a52ca27088dd4d5d378e4a06befe6c4229551233ad7b0596acd7cee88ee3",
+    "styles.css": "e0ad95bd871fc412ccac911704a49ef44d11b36c0670baa2347f723f8c588bdc"
+  }
+}

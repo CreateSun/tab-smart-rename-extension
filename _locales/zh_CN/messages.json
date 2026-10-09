@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Tab Rename" },
-  "extensionDescription": { "message": "本地优先、可预测的标签页重命名工具" },
+  "extensionName": { "message": "Tab Rename - 可预测的标签命名" },
+  "extensionDescription": { "message": "让相似的文档、工单和后台标签一眼可辨。可仅改当前页面、保留到标签关闭，或为匹配网址建立本地规则。" },
   "openPopup": { "message": "重命名当前标签页" }
 }

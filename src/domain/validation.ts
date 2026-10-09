@@ -1,42 +1,61 @@
-import { MAX_NAME_CODE_POINTS, type RenameRule } from "./types";
+import { MAX_ICON_CODE_POINTS, MAX_NAME_CODE_POINTS, type RenameRule } from "./types";
 import { normalizeExactUrl, normalizeHostname, normalizeUrlPattern } from "./url";
+import type { Language } from "./types";
+import { translate, type MessageKey } from "../shared/i18n";
 
-export function normalizeName(name: unknown): string {
-  if (typeof name !== "string") throw new Error("名称必须是文本");
+export class ValidationError extends Error {
+  constructor(public readonly key: MessageKey, public readonly params: Record<string, string | number> = {}, language: Language = "en") {
+    super(translate(language, key, params));
+    this.name = "ValidationError";
+  }
+}
+
+export function normalizeName(name: unknown, language: Language = "en"): string {
+  if (typeof name !== "string") throw new ValidationError("error.nameNotText", {}, language);
   const normalized = name.trim();
   const length = Array.from(normalized).length;
-  if (length === 0) throw new Error("名称不能为空");
-  if (length > MAX_NAME_CODE_POINTS) throw new Error(`名称不能超过 ${MAX_NAME_CODE_POINTS} 个字符`);
+  if (length === 0) throw new ValidationError("error.nameEmpty", {}, language);
+  if (length > MAX_NAME_CODE_POINTS) throw new ValidationError("error.nameTooLong", { max: MAX_NAME_CODE_POINTS }, language);
   return normalized;
 }
 
-export function validateRule(input: unknown): RenameRule {
-  if (!input || typeof input !== "object") throw new Error("规则必须是对象");
-  const item = input as Partial<RenameRule>;
-  if (typeof item.id !== "string" || !item.id) throw new Error("规则 id 无效");
-  if (typeof item.enabled !== "boolean") throw new Error("规则启用状态无效");
-  if (typeof item.createdAt !== "string" || !Number.isFinite(Date.parse(item.createdAt))) throw new Error("createdAt 无效");
-  if (typeof item.updatedAt !== "string" || !Number.isFinite(Date.parse(item.updatedAt))) throw new Error("updatedAt 无效");
-  if (!item.match || typeof item.match !== "object") throw new Error("规则 matcher 无效");
+export function normalizeIcon(icon: unknown, language: Language = "en"): string | null {
+  if (icon === undefined || icon === null || icon === "") return null;
+  if (typeof icon !== "string") throw new ValidationError("error.iconNotText", {}, language);
+  const normalized = icon.trim();
+  if (!normalized) return null;
+  if (Array.from(normalized).length > MAX_ICON_CODE_POINTS) throw new ValidationError("error.iconTooLong", { max: MAX_ICON_CODE_POINTS }, language);
+  return normalized;
+}
 
-  const name = normalizeName(item.name);
+export function validateRule(input: unknown, language: Language = "en"): RenameRule {
+  if (!input || typeof input !== "object") throw new ValidationError("error.ruleObject", {}, language);
+  const item = input as Partial<RenameRule>;
+  if (typeof item.id !== "string" || !item.id) throw new ValidationError("error.ruleId", {}, language);
+  if (typeof item.enabled !== "boolean") throw new ValidationError("error.ruleEnabled", {}, language);
+  if (typeof item.createdAt !== "string" || !Number.isFinite(Date.parse(item.createdAt))) throw new ValidationError("error.createdAt", {}, language);
+  if (typeof item.updatedAt !== "string" || !Number.isFinite(Date.parse(item.updatedAt))) throw new ValidationError("error.updatedAt", {}, language);
+  if (!item.match || typeof item.match !== "object") throw new ValidationError("error.matcher", {}, language);
+
+  const name = normalizeName(item.name, language);
+  const icon = normalizeIcon(item.icon, language);
   // Rules saved before rule names were introduced keep a readable label.
-  const ruleName = normalizeName(item.ruleName ?? name);
+  const ruleName = normalizeName(item.ruleName ?? name, language);
   const match = item.match;
   if (match.kind === "exact-url") {
     const value = normalizeExactUrl(match.value);
-    if (!value) throw new Error("精确 URL 无效");
-    return { id: item.id, ruleName, name, match: { kind: "exact-url", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
+    if (!value) throw new ValidationError("error.exactUrl", {}, language);
+    return { id: item.id, ruleName, name, icon, match: { kind: "exact-url", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
   }
   if (match.kind === "url-pattern") {
     const value = normalizeUrlPattern(match.value);
-    if (!value) throw new Error("URL 正则无效");
-    return { id: item.id, ruleName, name, match: { kind: "url-pattern", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
+    if (!value) throw new ValidationError("error.urlPattern", {}, language);
+    return { id: item.id, ruleName, name, icon, match: { kind: "url-pattern", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
   }
   if (match.kind === "host") {
     const value = normalizeHostname(match.value);
-    if (!value || value.includes("/")) throw new Error("域名无效");
-    return { id: item.id, ruleName, name, match: { kind: "host", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
+    if (!value || value.includes("/")) throw new ValidationError("error.host", {}, language);
+    return { id: item.id, ruleName, name, icon, match: { kind: "host", value }, enabled: item.enabled, createdAt: item.createdAt, updatedAt: item.updatedAt };
   }
-  throw new Error("不支持的 matcher 类型");
+  throw new ValidationError("error.matcherKind", {}, language);
 }

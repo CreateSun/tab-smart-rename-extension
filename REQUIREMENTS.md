@@ -49,7 +49,7 @@ MVP 不包含：
 - 登录、云服务、团队共享或第三方后端。
 - 跨设备同步。
 - favicon、颜色或标签分组定制。
-- 正则、URL 前缀和用户自定义规则排序。
+- URL 前缀快捷规则和用户自定义规则排序；URL 模式与正则捕获由当前规则编辑器支持。
 - 批量重命名当前所有标签。
 - 修改浏览器原生标签条右键菜单；Chromium 扩展 API 不提供该能力。
 - 绕过 chrome://、Chrome Web Store、新标签页等浏览器受保护页面限制。
@@ -523,4 +523,3 @@ host_permissions 应优先使用 optional_host_permissions，由 onboarding 或�
 - 周留存 ≥25%。
 - 至少 20 位用户每周完成 5 次以上改名。
 - Page/Tab/Permanent 三种模式均有真实使用，且用户能正确理解来源和撤销方式。
-
