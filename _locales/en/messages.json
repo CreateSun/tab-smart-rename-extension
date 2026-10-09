@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Tab Renamer - Free Tab Title Editor" },
-  "extensionDescription": { "message": "Rename any browser tab instantly. Supports exact URL, URL pattern, and domain matching rules. Local-first, no data collected." },
+  "extensionName": { "message": "Tab Rename - Predictable Tab Titles" },
+  "extensionDescription": { "message": "Spot the right doc, issue, or dashboard fast. Rename this page, this tab session, or every matching URL—locally." },
   "openPopup": { "message": "Rename the current tab" }
 }

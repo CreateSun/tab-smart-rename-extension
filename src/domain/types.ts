@@ -1,5 +1,6 @@
 export const SCHEMA_VERSION = 1 as const;
 export const MAX_NAME_CODE_POINTS = 256;
+export const MAX_ICON_CODE_POINTS = 8;
 export const MAX_RULES = 5_000;
 
 export type ExactUrlMatch = { kind: "exact-url"; value: string };
@@ -15,20 +16,23 @@ export type RenameRule = {
   enabled: boolean;
   createdAt: string;
   updatedAt: string;
+  icon?: string | null;
 };
+
+export type Language = "en" | "zh_CN";
 
 export type StoredStateV1 = {
   schemaVersion: typeof SCHEMA_VERSION;
   rules: RenameRule[];
-  settings: { guardDebounceMs: number; onboardingCompleted: boolean };
+  settings: { guardDebounceMs: number; onboardingCompleted: boolean; language: Language };
 };
 
-export type TabOverride = { name: string; createdAt: string };
+export type TabOverride = { name: string; createdAt: string; icon?: string | null };
 export type SessionState = { tabOverrides: Record<string, TabOverride> };
 
 export type PageOverride =
-  | { kind: "name"; name: string }
-  | { kind: "suppress" };
+  | { kind: "name"; name: string; icon?: string | null }
+  | { kind: "suppress"; icon?: string | null };
 
 export type EffectiveSource =
   | { kind: "page" }
@@ -38,10 +42,10 @@ export type EffectiveSource =
   | { kind: "host"; matcher: string; ruleId: string }
   | { kind: "original" };
 
-export type Resolution = { name: string | null; source: EffectiveSource };
+export type Resolution = { name: string | null; source: EffectiveSource; effectiveIcon: string | null; originalIcon: string | null };
 
 export const DEFAULT_STATE: StoredStateV1 = {
   schemaVersion: SCHEMA_VERSION,
   rules: [],
-  settings: { guardDebounceMs: 150, onboardingCompleted: false }
+  settings: { guardDebounceMs: 150, onboardingCompleted: false, language: "en" }
 };

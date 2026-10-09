@@ -1,15 +1,29 @@
 import { describe, expect, it } from "vitest";
-import { resolveEffectiveName } from "../src/domain/resolver";
+import { previewRule, resolveEffectiveName } from "../src/domain/resolver";
 import type { RenameRule } from "../src/domain/types";
-import { normalizeExactUrl, normalizeHostname } from "../src/domain/url";
+import { matchUrlPattern, normalizeExactUrl, normalizeHostname } from "../src/domain/url";
 
-const rule = (kind: "exact-url" | "url-pattern" | "host", value: string, name: string, updatedAt = "2026-09-16T00:00:00.000Z", enabled = true): RenameRule => ({ id: `${kind}-${name}`, ruleName: name, name, match: { kind, value } as RenameRule["match"], enabled, createdAt: updatedAt, updatedAt });
+const rule = (kind: "exact-url" | "url-pattern" | "host", value: string, name: string, updatedAt = "2026-09-16T00:00:00.000Z", enabled = true, icon?: string | null): RenameRule => ({ id: `${kind}-${name}`, ruleName: name, name, icon, match: { kind, value } as RenameRule["match"], enabled, createdAt: updatedAt, updatedAt });
 const base = { rawUrl: "https://example.com/work?a=1#part", originalTitle: "Original", rules: [] as RenameRule[] };
 
 describe("URL normalization", () => {
   it("removes fragments while preserving path and query", () => expect(normalizeExactUrl(base.rawUrl)).toBe("https://example.com/work?a=1"));
   it("normalizes host names without widening subdomains", () => { expect(normalizeHostname("HTTPS://EXAMPLE.COM/path")).toBe("example.com"); expect(normalizeHostname("sub.example.com")).toBe("sub.example.com"); });
   it("rejects unsupported protocols", () => expect(normalizeExactUrl("chrome://settings")).toBeNull());
+});
+
+describe("rule preview", () => {
+  const preview = { kind: "exact-url" as const, value: "https://example.com/work", name: "Work", rawUrl: "https://example.com/work" };
+
+  it("reports the invalid preview field without throwing", () => {
+    expect(previewRule({ ...preview, rawUrl: "not-a-url" })).toEqual({ status: "invalid", reason: "target-url" });
+    expect(previewRule({ ...preview, value: "not-a-url" })).toEqual({ status: "invalid", reason: "match-value" });
+    expect(previewRule({ ...preview, name: "" })).toEqual({ status: "invalid", reason: "name" });
+  });
+
+  it("previews a multi-segment capture with interpolation", () => {
+    expect(previewRule({ kind: "url-pattern", value: "https://example.com/app/{1*}", name: "App $1", rawUrl: "https://example.com/app/one/two" })).toEqual({ status: "matched", name: "App one/two" });
+  });
 });
 
 describe("effective name resolver", () => {
@@ -29,6 +43,33 @@ describe("effective name resolver", () => {
     const result = resolveEffectiveName({ ...base, rawUrl: "https://captain.release.ctripcorp.com/app/platform/deployments", rules });
     expect(result.name).toBe("platform");
     expect(result.source.kind).toBe("url-pattern");
+  });
+  it("resolves the Ares corp module pattern with both captured path segments", () => {
+    const rules = [rule("url-pattern", "https://home.ares.ctripcorp.com/panel/module/corp/{1}/{2}", "$1 $2")];
+    const result = resolveEffectiveName({
+      ...base,
+      rawUrl: "https://home.ares.ctripcorp.com/panel/module/corp/cyk-ui-pc/2.91.2",
+      rules,
+    });
+    expect(result.name).toBe("cyk-ui-pc 2.91.2");
+    expect(result.source.kind).toBe("url-pattern");
+  });
+  it("captures multiple path segments with the explicit wide capture token", () => {
+    const rules = [rule("url-pattern", "https://home.ares.ctripcorp.com/panel/module/corp/{1*}", "$1 / {1}")];
+    const result = resolveEffectiveName({
+      ...base,
+      rawUrl: "https://home.ares.ctripcorp.com/panel/module/corp/cyk-ui-pc/2.91.2",
+      rules,
+    });
+    expect(result.name).toBe("cyk-ui-pc/2.91.2 / cyk-ui-pc/2.91.2");
+  });
+  it("keeps the legacy capture-plus-wildcard syntax single-segment", () => {
+    expect(matchUrlPattern("https://example.com/app/{1}*", "https://example.com/app/alpha/beta")).toBeNull();
+    expect(matchUrlPattern("https://example.com/app/{1}*", "https://example.com/app/alpha-beta")).not.toBeNull();
+  });
+  it("does not let a wide capture consume query or hash delimiters", () => {
+    const captures = matchUrlPattern("https://example.com/app/{1*}?view=full", "https://example.com/app/alpha/beta?view=full#details");
+    expect(captures?.[1]).toBe("alpha/beta");
   });
   it("escapes URL special chars in {n} patterns (query strings)", () => {
     const rules = [rule("url-pattern", "https://iquality.ctripcorp.com/feedback/feedbackForMeHandle?pid={1}&v={2}", "IQ-$1-$2")];
@@ -54,5 +95,12 @@ describe("effective name resolver", () => {
     expect(resolveEffectiveName({ ...base, rules }).name).toBe("Exact");
     expect(resolveEffectiveName({ ...base, rawUrl: "https://example.com/work?a=2", rules }).name).toBe("Pattern-2");
     expect(resolveEffectiveName({ ...base, rawUrl: "https://example.com/other", rules }).name).toBe("Host");
+  });
+  it("keeps the original favicon separate from an optional icon override", () => {
+    const originalIcon = "https://example.com/favicon.ico";
+    const legacy = resolveEffectiveName({ ...base, originalIcon, rules: [rule("host", "example.com", "Host")] });
+    expect(legacy).toMatchObject({ effectiveIcon: null, originalIcon });
+    const overridden = resolveEffectiveName({ ...base, originalIcon, rules: [rule("host", "example.com", "Host", undefined, true, "🚀")] });
+    expect(overridden).toMatchObject({ effectiveIcon: "🚀", originalIcon });
   });
 });

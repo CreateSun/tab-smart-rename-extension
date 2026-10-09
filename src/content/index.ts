@@ -22,10 +22,10 @@ if (!scope.__tabRenameListenerInstalled) {
     switch (request.type) {
       case "GET_PAGE_STATE": sendResponse(controller.getState()); break;
       case "SET_PAGE_OVERRIDE":
-        controller.setPageOverride(request.suppress ? { kind: "suppress" } : request.name === null ? null : { kind: "name", name: request.name });
+        controller.setPageOverride(request.suppress ? { kind: "suppress", icon: null } : request.name === null ? null : { kind: "name", name: request.name, icon: request.icon });
         sendResponse(controller.getState());
         break;
-      case "APPLY_DECISION": controller.apply(request.name, request.debounceMs); sendResponse({ ok: true }); break;
+      case "APPLY_DECISION": controller.apply(request.name, request.icon ?? null, request.debounceMs, request.originalIcon); sendResponse({ ok: true }); break;
       case "CLEAR_DECISION": controller.clear(); sendResponse({ ok: true }); break;
       case "OPEN_RENAME_OVERLAY": void overlay.open(); sendResponse({ ok: true }); break;
     }

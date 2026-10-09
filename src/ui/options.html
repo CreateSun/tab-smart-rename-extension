@@ -1,36 +1,50 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tab Rename · 管理</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="options.css"></head>
-<body><main class="options"><header><div><p class="eyebrow">TAB RENAME</p><div class="title-row"><h1>永久规则</h1><button id="rule-help" class="help-button" type="button" aria-label="查看规则使用说明" aria-haspopup="dialog">?</button></div><p>精确 URL 优先于域名规则；当前页面和当前标签命名始终优先。</p></div><div class="permission-wrap"><button id="permission" class="secondary">授权自动应用</button><span class="tip-wrap"><button class="help-button" type="button" aria-label="授权说明">?</button><span class="tip" role="tooltip">授权后，永久规则可在所有网站上自动生效，无需手动触发</span></span></div></header>
-<section class="toolbar"><input id="search" type="search" placeholder="搜索名称或 matcher" aria-label="搜索规则"><button id="add">新建规则</button></section>
-<p id="status" role="status"></p><div id="rules" class="rule-list"></div>
-<section><h2>导入与导出</h2><div class="inline"><button id="export" class="secondary">导出 JSON</button><label class="button secondary">导入 JSON<input id="import" type="file" accept="application/json,.json" hidden></label></div></section>
-<footer>版本 0.1.0 · 数据只保存在本机 · <a href="PRIVACY.md" target="_blank">隐私说明</a></footer></main>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tab Rename · Rules</title><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="options.css"></head>
+<body><main class="options"><header><div><p class="eyebrow">TAB RENAME</p><div class="title-row"><h1 id="page-title">Permanent rules</h1><button id="rule-help" class="help-button" type="button" aria-haspopup="dialog">?</button></div><p id="page-subtitle"></p></div><div class="permission-wrap"><button id="permission" class="secondary"></button><span class="tip-wrap"><button id="permission-help" class="help-button" type="button">?</button><span id="permission-tip" class="tip" role="tooltip"></span></span><div id="language-toggle" class="language-toggle" role="group" aria-label="Language"><button type="button" data-language="en" aria-pressed="true">EN</button><button type="button" data-language="zh_CN" aria-pressed="false">中文</button></div></div></header>
+<aside class="permission-faq" aria-labelledby="permission-faq-title"><h2 id="permission-faq-title"></h2><p id="permission-faq-copy"></p></aside>
+<section class="rules-panel" aria-labelledby="rules-heading">
+  <div class="rules-panel-head"><h2 id="rules-heading"></h2><span id="rule-count" class="rule-count"></span></div>
+  <div class="toolbar"><input id="search" type="search"><button id="add"></button></div>
+  <p id="status" role="status"></p>
+  <div id="rules" class="rule-list"></div>
+</section>
+<section><h2 id="import-export-title"></h2><div class="inline"><button id="export" class="secondary"></button><label id="import-label" class="button secondary"><input id="import" type="file" accept="application/json,.json" hidden></label></div></section>
+<footer><span id="footer-copy"></span> · <a id="privacy-link" href="PRIVACY.md" target="_blank"></a></footer></main>
 <div id="rule-dialog" class="rule-dialog-backdrop" hidden><section class="rule-dialog" role="dialog" aria-modal="true" aria-labelledby="rule-dialog-title">
   <form id="rule-form" novalidate>
-    <header class="rule-dialog-header"><div><p class="eyebrow">// RULE_EDITOR</p><h2 id="rule-dialog-title">新建重命名规则</h2></div><button id="rule-close" class="icon-button" type="button" aria-label="关闭">×</button></header>
+    <header class="rule-dialog-header"><div><p class="eyebrow">// RULE_EDITOR</p><h2 id="rule-dialog-title"></h2></div><button id="rule-close" class="icon-button" type="button">×</button></header>
     <input id="rule-id" type="hidden">
-    <label class="field-label" for="rule-kind">过滤类型</label>
-    <select id="rule-kind" name="kind"><option value="exact-url">精确 URL</option><option value="url-pattern">URL 正则（{1} / $1）</option><option value="host">域名</option></select>
-    <label class="field-label" for="rule-value">过滤内容</label>
-    <input id="rule-value" name="value" type="text" required autocomplete="off" placeholder="https://example.com/projects/42" aria-describedby="rule-pattern-help">
-    <small id="rule-pattern-help" class="rule-pattern-help">正则规则可使用捕获组；名称中的 $1 会替换为第一个捕获值。{1} 是单个路径段捕获的快捷写法。</small>
-    <label class="field-label" for="rule-label">规则名称</label>
-    <input id="rule-label" name="ruleLabel" type="text" required maxlength="100" autocomplete="off" placeholder="例如：Linear 任务页">
-    <label class="field-label" for="rule-name">新标签名称</label>
-    <input id="rule-name" name="name" type="text" required maxlength="100" autocomplete="off" placeholder="项目面板">
+    <label id="rule-kind-label" class="field-label" for="rule-kind"></label>
+    <select id="rule-kind" name="kind"><option value="exact-url"></option><option value="url-pattern"></option><option value="host"></option></select>
+    <label id="rule-value-label" class="field-label" for="rule-value"></label>
+    <input id="rule-value" name="value" type="text" required autocomplete="off" aria-describedby="rule-pattern-help">
+    <small id="rule-pattern-help" class="rule-pattern-help"></small>
+    <label id="rule-label-label" class="field-label" for="rule-label"></label>
+    <input id="rule-label" name="ruleLabel" type="text" required maxlength="100" autocomplete="off">
+    <label id="rule-name-label" class="field-label" for="rule-name"></label>
+    <input id="rule-name" name="name" type="text" required maxlength="100" autocomplete="off">
     <p id="rule-preview" class="rule-preview" aria-live="polite"></p>
+    <button id="rule-test-toggle" class="secondary rule-test-toggle" type="button" aria-controls="rule-test" aria-expanded="false"></button>
+    <div id="rule-test" class="rule-test" role="group" aria-labelledby="rule-test-title" hidden>
+      <h3 id="rule-test-title"></h3>
+      <p id="rule-test-description" class="rule-test-description"></p>
+      <label id="rule-test-label" class="field-label" for="rule-test-url"></label>
+      <div class="rule-test-controls"><input id="rule-test-url" class="rule-test-url" type="url" autocomplete="off" spellcheck="false" aria-describedby="rule-test-description rule-test-result"><button id="rule-test-run" class="secondary" type="button"></button></div>
+      <p id="rule-test-result" class="rule-test-result" aria-live="polite" aria-atomic="true"></p>
+    </div>
     <p id="rule-error" class="error" role="alert"></p>
-    <div class="dialog-actions"><button id="rule-form-help" class="help-button form-help-button" type="button" aria-label="查看规则使用说明" aria-haspopup="dialog">?</button><span class="dialog-actions-spacer"></span><button id="rule-cancel" class="secondary" type="button">取消</button><button type="submit">创建规则 <kbd>↵</kbd></button></div>
+    <div class="dialog-actions"><button id="rule-form-help" class="help-button form-help-button" type="button" aria-haspopup="dialog">?</button><span class="dialog-actions-spacer"></span><button id="rule-cancel" class="secondary" type="button"></button><button id="rule-submit" type="submit"><span></span> <kbd>↵</kbd></button></div>
   </form>
 </section></div>
 <div id="rule-help-dialog" class="rule-dialog-backdrop" hidden><section class="rule-dialog rule-help-dialog" role="dialog" aria-modal="true" aria-labelledby="rule-help-title">
-  <header class="rule-dialog-header"><div><p class="eyebrow">RULE GUIDE</p><h2 id="rule-help-title">选择适合的规则</h2></div><button id="rule-help-close" class="icon-button" type="button" aria-label="关闭规则说明">×</button></header>
-  <p class="rule-help-intro">规则命中时，标签会自动使用“新标签名称”。选择最小匹配范围，结果会更可预测。</p>
+  <header class="rule-dialog-header"><div><p class="eyebrow">RULE GUIDE</p><h2 id="rule-help-title"></h2></div><button id="rule-help-close" class="icon-button" type="button">×</button></header>
+  <p id="rule-help-intro" class="rule-help-intro"></p>
   <section class="rule-help-list">
-    <article><h3>精确 URL</h3><p>只匹配一个完整网址，适合固定页面。</p><dl><dt>规则</dt><dd><code>https://notion.so/acme/weekly-review</code></dd><dt>实际 URL</dt><dd><code>https://notion.so/acme/weekly-review</code></dd><dt>title 效果</dt><dd><code>本周复盘</code></dd></dl></article>
-    <article><h3>域名</h3><p>匹配该域名下所有页面，适合整站统一命名。</p><dl><dt>规则</dt><dd><code>github.com</code></dd><dt>实际 URL</dt><dd><code>https://github.com/acme/app/pulls</code></dd><dt>title 效果</dt><dd><code>GitHub 工作区</code></dd></dl></article>
-    <article><h3>URL 正则：花括号捕获</h3><p><code>{1}</code> 表示一个路径段；名称中的 <code>$1</code> 会替换为捕获到的内容。</p><dl><dt>规则</dt><dd><code>https://linear.app/acme/issue/{1}</code></dd><dt>实际 URL</dt><dd><code>https://linear.app/acme/issue/ENG-42</code></dd><dt>title 效果</dt><dd><code>任务 ENG-42</code>（名称填：<code>任务 $1</code>）</dd></dl></article>
-    <article><h3>URL 正则：通配内容</h3><p>使用正则 <code>.*</code> 匹配任意后续路径，适合整个栏目。</p><dl><dt>规则</dt><dd><code>https://docs.example.com/guides/.*</code></dd><dt>实际 URL</dt><dd><code>https://docs.example.com/guides/getting-started</code></dd><dt>title 效果</dt><dd><code>产品文档</code></dd></dl></article>
-    <article><h3>URL 正则：圆括号捕获</h3><p>圆括号可捕获更灵活的内容；使用 <code>$1</code> 写入名称。</p><dl><dt>规则</dt><dd><code>https://app.example.com/reports/(daily|weekly)</code></dd><dt>实际 URL</dt><dd><code>https://app.example.com/reports/weekly</code></dd><dt>title 效果</dt><dd><code>报告：weekly</code>（名称填：<code>报告：$1</code>）</dd></dl></article>
+    <article><h3 data-i18n="exactUrl"></h3><p data-i18n="guideExactDescription"></p><dl><dt data-i18n="guideRule"></dt><dd><code>https://notion.so/acme/weekly-review</code></dd><dt data-i18n="guideActual"></dt><dd><code>https://notion.so/acme/weekly-review</code></dd><dt data-i18n="guideTitleEffect"></dt><dd><code data-i18n="exampleExact"></code></dd></dl></article>
+    <article><h3 data-i18n="host"></h3><p data-i18n="guideHostDescription"></p><dl><dt data-i18n="guideRule"></dt><dd><code>github.com</code></dd><dt data-i18n="guideActual"></dt><dd><code>https://github.com/acme/app/pulls</code></dd><dt data-i18n="guideTitleEffect"></dt><dd><code data-i18n="exampleHost"></code></dd></dl></article>
+    <article><h3 data-i18n="guidePatternBrace"></h3><p data-i18n="guidePatternDescription"></p><dl><dt data-i18n="guideRule"></dt><dd><code>https://linear.app/acme/issue/{1}</code></dd><dt data-i18n="guideActual"></dt><dd><code>https://linear.app/acme/issue/ENG-42</code></dd><dt data-i18n="guideTitleEffect"></dt><dd><code data-i18n="exampleBrace"></code></dd></dl></article>
+    <article><h3 data-i18n="guidePatternWide"></h3><p data-i18n="guideWideDescription"></p><dl><dt data-i18n="guideRule"></dt><dd><code>https://home.ares.ctripcorp.com/panel/module/corp/{1*}</code></dd><dt data-i18n="guideActual"></dt><dd><code>https://home.ares.ctripcorp.com/panel/module/corp/cyk-ui-pc/2.91.2</code></dd><dt data-i18n="guideName"></dt><dd><code data-i18n="exampleWideName"></code></dd><dt data-i18n="guideResult"></dt><dd><code data-i18n="exampleWideResult"></code></dd></dl></article>
+    <article><h3 data-i18n="guidePatternWildcard"></h3><p data-i18n="guideWildcardDescription"></p><dl><dt data-i18n="guideRule"></dt><dd><code>https://docs.example.com/guides/.*</code></dd><dt data-i18n="guideActual"></dt><dd><code>https://docs.example.com/guides/getting-started</code></dd><dt data-i18n="guideTitleEffect"></dt><dd><code data-i18n="exampleWildcard"></code></dd></dl></article>
+    <article><h3 data-i18n="guidePatternCapture"></h3><p data-i18n="guideCaptureDescription"></p><dl><dt data-i18n="guideRule"></dt><dd><code>https://app.example.com/reports/(daily|weekly)</code></dd><dt data-i18n="guideActual"></dt><dd><code>https://app.example.com/reports/weekly</code></dd><dt data-i18n="guideTitleEffect"></dt><dd><code data-i18n="exampleCapture"></code></dd></dl></article>
   </section>
-  <div class="dialog-actions"><button id="rule-help-done" type="button">知道了</button></div>
+  <div class="dialog-actions"><button id="rule-help-done" type="button"></button></div>
 </section></div><script src="options.js"></script></body></html>

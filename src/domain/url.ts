@@ -25,6 +25,8 @@ export function normalizeHostname(rawUrlOrHost: string): string | null {
 }
 
 const captureReference = /\{([1-9][0-9]*)\}|\$([1-9][0-9]*)/g;
+const patternCapture = /\{([1-9][0-9]*)(\*)?\}/;
+const patternCaptureGlobal = /\{([1-9][0-9]*)(\*)?\}/g;
 
 export function normalizeUrlPattern(input: unknown): string | null {
   if (typeof input !== "string") return null;
@@ -40,12 +42,12 @@ export function matchUrlPattern(pattern: string, rawUrl: string): RegExpExecArra
 }
 
 function patternToRegex(pattern: string): string {
-  if (/\{[1-9][0-9]*\}/.test(pattern)) {
-    return pattern.split(/(\{[1-9][0-9]*\})/).map((segment) =>
-      /^\{[1-9][0-9]*\}$/.test(segment) ? "([^/?#]+)" : escapeRegex(segment).replace(/\\\.\\\*/g, ".*").replace(/\\\*/g, "[^/]*")
+  if (patternCapture.test(pattern)) {
+    return pattern.split(/(\{[1-9][0-9]*\*?\})/).map((segment) =>
+      patternCapture.test(segment) ? (segment.endsWith("*}") ? "([^?#]+)" : "([^/?#]+)") : escapeRegex(segment).replace(/\\\.\\\*/g, ".*").replace(/\\\*/g, "[^/]*")
     ).join("");
   }
-  return pattern.replace(/\{[1-9][0-9]*\}/g, "([^/?#]+)");
+  return pattern.replace(patternCaptureGlobal, (_token, _index: string, wide: string | undefined) => wide ? "([^?#]+)" : "([^/?#]+)");
 }
 
 function escapeRegex(text: string): string {

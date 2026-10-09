@@ -1,5 +1,5 @@
 {
-  "extensionName": { "message": "Tab Renamer - 免费标签页重命名工具" },
-  "extensionDescription": { "message": "一键重命名浏览器标签页。支持精确 URL、URL 正则和域名三种匹配规则，数据仅保存在本地。" },
+  "extensionName": { "message": "Tab Rename - 可预测的标签命名" },
+  "extensionDescription": { "message": "让相似的文档、工单和后台标签一眼可辨。可仅改当前页面、保留到标签关闭，或为匹配网址建立本地规则。" },
   "openPopup": { "message": "重命名当前标签页" }
 }
