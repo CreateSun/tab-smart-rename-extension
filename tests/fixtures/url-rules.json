@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "exportedAt": "2026-10-10T16:00:00.000Z",
+  "rules": [
+    {
+      "id": "67910779-eb47-4302-86f2-a69359c82c60",
+      "ruleName": "MOM",
+      "name": "{3}",
+      "icon": null,
+      "match": { "kind": "url-pattern", "value": "https://contract.mobile.flight.ctripcorp.com/#/operation-detail/{1}/{2}/{3}*" },
+      "enabled": true,
+      "createdAt": "2026-10-10T14:27:59.353Z",
+      "updatedAt": "2026-10-10T14:27:59.353Z"
+    },
+    {
+      "id": "47cf8ea1-d01e-4937-8408-d357b58440b3",
+      "ruleName": "ES",
+      "name": "ES/{1}",
+      "icon": null,
+      "match": { "kind": "url-pattern", "value": "https://es.ops.ctripcorp.com/#/dashboard/temp/{1}" },
+      "enabled": true,
+      "createdAt": "2026-10-10T14:29:49.696Z",
+      "updatedAt": "2026-10-10T14:29:49.696Z"
+    },
+    {
+      "id": "70baad70-0fb3-4bde-86db-ff6bd8939663",
+      "ruleName": "Ares",
+      "name": "{1}/{2}",
+      "icon": null,
+      "match": { "kind": "url-pattern", "value": "https://home.ares.ctripcorp.com/panel/module/corp/{1}/{2}" },
+      "enabled": true,
+      "createdAt": "2026-10-10T14:30:55.952Z",
+      "updatedAt": "2026-10-10T14:30:55.952Z"
+    },
+    {
+      "id": "03f2a8f4-a06b-45da-95c1-6362b27ce27f",
+      "ruleName": "Captain",
+      "name": "{1}",
+      "icon": null,
+      "match": { "kind": "url-pattern", "value": "https://captain.release.ctripcorp.com/app/{1}/.*" },
+      "enabled": true,
+      "createdAt": "2026-10-10T14:32:09.734Z",
+      "updatedAt": "2026-10-10T14:32:09.734Z"
+    },
+    {
+      "id": "0f1c6a52-2b8e-4a39-9d55-7c1f3e9a0b01",
+      "ruleName": "Ares wide",
+      "name": "Ares {1}",
+      "icon": null,
+      "match": { "kind": "url-pattern", "value": "https://home.ares.ctripcorp.com/panel/module/{1*}" },
+      "enabled": true,
+      "createdAt": "2026-10-10T16:00:00.000Z",
+      "updatedAt": "2026-10-10T16:00:00.000Z"
+    },
+    {
+      "id": "0f1c6a52-2b8e-4a39-9d55-7c1f3e9a0b02",
+      "ruleName": "iQuality",
+      "name": "IQ-$1",
+      "icon": null,
+      "match": { "kind": "url-pattern", "value": "https://iquality.ctripcorp.com/feedback/feedbackForMeHandle?pid={1}&v={2}" },
+      "enabled": true,
+      "createdAt": "2026-10-10T16:00:00.000Z",
+      "updatedAt": "2026-10-10T16:00:00.000Z"
+    },
+    {
+      "id": "0f1c6a52-2b8e-4a39-9d55-7c1f3e9a0b03",
+      "ruleName": "Captain regex",
+      "name": "$1 #$2",
+      "icon": null,
+      "match": { "kind": "url-pattern", "value": "https://captain\\.release\\.ctripcorp\\.com/(pipeline|approval)/([0-9]+)" },
+      "enabled": true,
+      "createdAt": "2026-10-10T16:00:00.000Z",
+      "updatedAt": "2026-10-10T16:00:00.000Z"
+    },
+    {
+      "id": "0f1c6a52-2b8e-4a39-9d55-7c1f3e9a0b04",
+      "ruleName": "Captain core app",
+      "name": "核心应用",
+      "icon": null,
+      "match": { "kind": "exact-url", "value": "https://captain.release.ctripcorp.com/app/100000001/overview" },
+      "enabled": true,
+      "createdAt": "2026-10-10T16:00:00.000Z",
+      "updatedAt": "2026-10-10T16:00:00.000Z"
+    },
+    {
+      "id": "0f1c6a52-2b8e-4a39-9d55-7c1f3e9a0b05",
+      "ruleName": "Captain host",
+      "name": "Captain",
+      "icon": null,
+      "match": { "kind": "host", "value": "captain.release.ctripcorp.com" },
+      "enabled": true,
+      "createdAt": "2026-10-10T16:00:00.000Z",
+      "updatedAt": "2026-10-10T16:00:00.000Z"
+    },
+    {
+      "id": "0f1c6a52-2b8e-4a39-9d55-7c1f3e9a0b06",
+      "ruleName": "ES host (disabled)",
+      "name": "ES 首页",
+      "icon": null,
+      "match": { "kind": "host", "value": "es.ops.ctripcorp.com" },
+      "enabled": false,
+      "createdAt": "2026-10-10T16:00:00.000Z",
+      "updatedAt": "2026-10-10T16:00:00.000Z"
+    }
+  ],
+  "cases": [
+    { "url": "https://contract.mobile.flight.ctripcorp.com/#/operation-detail/31455/12/getFlightOrderDetail", "rule": "MOM", "name": "getFlightOrderDetail", "note": "hash 路由，取第 3 段" },
+    { "url": "https://contract.mobile.flight.ctripcorp.com/#/operation-detail/31455/12/searchFlight?lang=zh-CN", "rule": "MOM", "name": "searchFlight", "note": "末尾 * 吸收 hash 内的 query" },
+    { "url": "https://contract.mobile.flight.ctripcorp.com/#/operation-detail/31455/12/%E6%9F%A5%E8%AF%A2%E8%AE%A2%E5%8D%95", "rule": "MOM", "name": "查询订单", "note": "捕获值会 URL 解码" },
+    { "url": "https://contract.mobile.flight.ctripcorp.com/#/operation-detail/31455/12", "rule": null, "note": "缺少第 3 段" },
+    { "url": "https://contract.mobile.flight.ctripcorp.com/#/operation-detail/31455/12/getOrder/history", "rule": null, "note": "{3}* 不跨路径段" },
+    { "url": "https://contract.mobile.flight.ctripcorp.com/#/project-list", "rule": null },
+    { "url": "http://contract.mobile.flight.ctripcorp.com/#/operation-detail/31455/12/getFlightOrderDetail", "rule": null, "note": "协议不同" },
+
+    { "url": "https://es.ops.ctripcorp.com/#/dashboard/temp/fws-flight-order", "rule": "ES", "name": "ES/fws-flight-order" },
+    { "url": "https://es.ops.ctripcorp.com/#/dashboard/temp/fws-flight-order?_g=(time:(from:now-15m))", "rule": null, "note": "模式锚定完整 URL：hash 内带 query 时需在模式末尾加 * 或 .*" },
+    { "url": "https://es.ops.ctripcorp.com/#/dashboard/temp/a/b", "rule": null, "note": "{1} 只捕获单段" },
+    { "url": "https://es.ops.ctripcorp.com/#/discover", "rule": null, "note": "禁用的 host 规则不生效" },
+
+    { "url": "https://home.ares.ctripcorp.com/panel/module/corp/cyk-ui-pc/2.91.2", "rule": "Ares", "name": "cyk-ui-pc/2.91.2" },
+    { "url": "https://home.ares.ctripcorp.com/panel/module/corp/cyk-ui-pc/2.91.2#changelog", "rule": "Ares", "name": "cyk-ui-pc/2.91.2", "note": "非 hash 路由模式忽略 fragment" },
+    { "url": "https://HOME.ARES.CTRIPCORP.COM/panel/module/corp/cyk-ui-pc/2.91.2", "rule": "Ares", "name": "cyk-ui-pc/2.91.2", "note": "域名大小写不敏感" },
+    { "url": "https://home.ares.ctripcorp.com/panel/module/corp/cyk-ui-pc", "rule": "Ares wide", "name": "Ares corp/cyk-ui-pc", "note": "Ares 缺第 2 段，落到后续宽捕获规则" },
+    { "url": "https://home.ares.ctripcorp.com/panel/module/corp/cyk-ui-pc/2.91.2/build", "rule": "Ares wide", "name": "Ares corp/cyk-ui-pc/2.91.2/build", "note": "Ares 多一段，落到宽捕获规则" },
+    { "url": "https://home.ares.ctripcorp.com/panel/module/flight/booking-h5/1.0.3", "rule": "Ares wide", "name": "Ares flight/booking-h5/1.0.3" },
+    { "url": "https://home.ares.ctripcorp.com/panel/module/corp/cyk-ui-pc/2.91.2?tab=build", "rule": null, "note": "query 不在模式内，两条 Ares 规则都不命中" },
+
+    { "url": "https://captain.release.ctripcorp.com/app/100023456/deployments", "rule": "Captain", "name": "100023456" },
+    { "url": "https://captain.release.ctripcorp.com/app/100023456/", "rule": "Captain", "name": "100023456", "note": ".* 可匹配空串" },
+    { "url": "https://captain.release.ctripcorp.com/app/100023456/release/history?env=fat#top", "rule": "Captain", "name": "100023456", "note": ".* 吸收后续路径、query、hash" },
+    { "url": "https://captain.release.ctripcorp.com/app/100023456", "rule": "Captain host", "name": "Captain", "note": "缺少 /，模式不命中，回落到 host 规则" },
+    { "url": "https://captain.release.ctripcorp.com/", "rule": "Captain host", "name": "Captain" },
+    { "url": "https://captain.release.ctripcorp.com/app/100000001/overview", "rule": "Captain core app", "name": "核心应用", "note": "exact-url 优先于 url-pattern" },
+    { "url": "https://captain.release.ctripcorp.com/app/100000001/overview#logs", "rule": "Captain core app", "name": "核心应用", "note": "exact-url 忽略 hash" },
+    { "url": "https://captain.release.ctripcorp.com/approval/8812", "rule": "Captain regex", "name": "approval #8812", "note": "正则分组 + $n" },
+    { "url": "https://captain.release.ctripcorp.com/deploy/8812", "rule": "Captain host", "name": "Captain", "note": "正则分组未命中" },
+    { "url": "https://captain.release.ctripcorp.com.evil.example/app/100023456/x", "rule": null, "note": "域名后缀不能被绕过" },
+
+    { "url": "https://iquality.ctripcorp.com/feedback/feedbackForMeHandle?pid=7&v=1789613231843", "rule": "iQuality", "name": "IQ-7", "note": "query 中的 ? 和 & 按字面匹配" },
+    { "url": "https://iquality.ctripcorp.com/feedback/feedbackForMeHandle?v=1789613231843&pid=7", "rule": null, "note": "参数顺序不同" }
+  ]
+}

@@ -36,9 +36,14 @@ export function normalizeUrlPattern(input: unknown): string | null {
 }
 
 export function matchUrlPattern(pattern: string, rawUrl: string): RegExpExecArray | null {
-  const normalizedUrl = normalizeExactUrl(rawUrl);
-  if (!normalizedUrl) return null;
-  try { return new RegExp("^(?:" + patternToRegex(pattern) + ")$").exec(normalizedUrl); } catch { return null; }
+  const parsedUrl = parseSupportedUrl(rawUrl);
+  if (!parsedUrl) return null;
+  try {
+    const matcher = new RegExp("^(?:" + patternToRegex(pattern) + ")$");
+    // Hash based routers keep the actual route after '#'. Try the complete URL
+    // first, then retain the legacy behavior for patterns that ignore fragments.
+    return matcher.exec(parsedUrl.href) ?? matcher.exec(normalizeExactUrl(rawUrl)!);
+  } catch { return null; }
 }
 
 function patternToRegex(pattern: string): string {

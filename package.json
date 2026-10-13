@@ -1,6 +1,6 @@
 {
   "name": "tab-rename",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,6 +8,7 @@
     "check": "npm run typecheck && npm test && npm run build",
     "dev": "node scripts/build.mjs --watch",
     "test": "vitest run",
+    "test:url-rules": "vitest run tests/url-rules.test.ts tests/domain.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

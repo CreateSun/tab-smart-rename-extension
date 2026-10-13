@@ -403,4 +403,23 @@ describe("rule editor", () => {
     document.querySelector("#rule-form")?.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     expect(document.querySelector("#rule-error")?.textContent).toBe("请填写规则名称、过滤内容和新标签名称。");
   });
+
+  it("keeps the file input inside the import label after translation and imports the chosen file", async () => {
+    document.body.innerHTML = page.replace('<input id="import" type="file">', '<label id="import-label" for="import"><span id="import-label-text"></span><input id="import" type="file" hidden></label>');
+    vi.mocked(chrome.runtime.sendMessage).mockImplementation(async (message) => {
+      const type = (message as unknown as { type: string }).type;
+      if (type === "IMPORT_RULES") return { ok: true, data: { added: 2, updated: 0, skipped: 0, errors: [] } };
+      return { ok: true, data: structuredClone(DEFAULT_STATE) };
+    });
+    await import("../src/ui/options");
+    await vi.waitFor(() => expect(document.querySelector("#import-label-text")?.textContent).toBe("Import JSON"));
+    const input = document.querySelector("#import-label #import") as HTMLInputElement;
+    expect(input).not.toBeNull();
+    // jsdom's File has no text(); Chrome's does.
+    const file = { name: "rules.json", size: 30, text: async () => '{"schemaVersion":1,"rules":[]}' };
+    Object.defineProperty(input, "files", { configurable: true, value: [file] });
+    input.dispatchEvent(new Event("change"));
+    await vi.waitFor(() => expect(document.querySelector("#status")?.textContent).toBe("Import complete: added 2, updated 0, skipped 0, errors 0"));
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({ type: "IMPORT_RULES", json: '{"schemaVersion":1,"rules":[]}' });
+  });
 });
