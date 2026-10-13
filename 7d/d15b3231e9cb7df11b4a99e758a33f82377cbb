@@ -1,0 +1,41 @@
+src/ui/options.ts
+  s_650817f6105a19::t_01d62b9dc51609 304-306
+  s_650817f6105a19::t_e9ccba15aa56d8 13
+manifest.json
+  s_650817f6105a19::t_c6eb8b2d97b724 5
+package-lock.json
+  s_650817f6105a19::t_f6a7070e398867 3,9
+tests/url-rules.test.ts
+  s_650817f6105a19::t_ceb39f5ea0e54a 9,13-14
+  s_650817f6105a19::t_32f9fa48ba443f 43
+  s_650817f6105a19::t_4ead5a5e7a6a14 1-8,10-12,15-42,44-52
+tests/options.test.ts
+  s_650817f6105a19::t_e885440b30bb5d 418-419
+  s_650817f6105a19::t_ddb0927e0a8c83 406-417,420-424
+package.json
+  s_650817f6105a19::t_68b8ee8cf397dc 3
+  s_650817f6105a19::t_455b615eded53d 11
+src/ui/options.html
+  s_650817f6105a19::t_cc959f56f2c85f 10
+src/shared/i18n.ts
+  s_650817f6105a19::t_2446585f109cb6 168
+  s_650817f6105a19::t_cdfe026be05dae 61
+tests/fixtures/url-rules.json
+  s_650817f6105a19::t_8b738c330d53c0 1-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.49-trip",
+  "base_commit_sha": "7dd15b3231e9cb7df11b4a99e758a33f82377cbb",
+  "prompts": {},
+  "sessions": {
+    "s_650817f6105a19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d4280629-8b1c-455a-931b-89c669867b9a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "yucui <yucui@trip.com>"
+    }
+  }
+}
