@@ -38,4 +38,4 @@ Page override 存在 content-script 内存中，因此刷新、跨文档导航�
 
 Emoji 图标覆盖与名称共享页面、标签、永久规则三个作用域和相同生命周期。存储只保留短 Emoji 字符串；网页原 favicon 单独作为运行时事实读取，旧规则没有 `icon` 字段时不覆盖图标。恢复原标题或 suppress 规则时同步移除注入的 favicon。
 
-新安装的建议快捷键统一改为 `Alt+Shift+R`，避免与 Chrome 的硬刷新组合冲突。建议键不等于已绑定键；Onboarding 只展示 `chrome.commands.getAll()` 返回的当前绑定，未分配时引导用户打开 `chrome://extensions/shortcuts`，并提供打开普通 Google 页面进行实际验证的入口。Chrome 将符号组合显示成英文按键名属于浏览器 UI 表示差异，不由扩展改写。
+新安装的建议快捷键改为 macOS `Command+Shift+E`、Windows/Linux `Ctrl+Shift+E`：既避开 Chrome 的硬刷新（`Cmd+Shift+R`），也避开 DevTools 命令菜单和 VS Code 命令面板常用的 `Cmd+Shift+P`。建议键不等于已绑定键；Onboarding 只展示 `chrome.commands.getAll()` 返回的当前绑定，未分配时用“Chrome 没有保留建议的快捷键，可能被其他软件占用”的表述，并提供一键打开 `chrome://extensions/shortcuts` 的“设置快捷键”按钮，不把技术原因直接甩给用户。

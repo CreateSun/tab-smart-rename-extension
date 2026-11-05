@@ -2,6 +2,7 @@ import type { RenameRule, StoredStateV1 } from "../domain/types";
 import { previewRule } from "../domain/resolver";
 import type { UiRequest } from "../shared/messages";
 import { normalizeLanguage, translate, type MessageKey } from "../shared/i18n";
+import { feedbackUrl, type FeedbackSource } from "../shared/feedback";
 const $ = <T extends HTMLElement>(s: string) => document.querySelector<T>(s)!;
 const LOG_PREFIX = "[Tab Rename]";
 let state: StoredStateV1;
@@ -10,7 +11,7 @@ const tx = (key: MessageKey, params: Record<string, string | number> = {}) => tr
 function applyTranslations() {
   document.documentElement.lang = language === "zh_CN" ? "zh-CN" : "en";
   document.title = `Tab Rename · ${tx("options.title")}`;
-  const text: Record<string, string> = {"#page-title":tx("options.title"),"#page-subtitle":tx("options.subtitle"),"#permission":tx("options.enableAutomatic"),"#permission-tip":tx("options.permissionHelp"),"#permission-faq-title":tx("options.permissionQuestion"),"#permission-faq-copy":tx("options.permissionFaq"),"#add":tx("options.newRule"),"#rules-heading":tx("options.rulesHeading"),"#import-export-title":tx("options.importExport"),"#export":tx("options.export"),"#import-label":tx("options.import"),"#privacy-link":tx("options.privacy"),"#footer-copy":tx("options.footer"),"#rule-kind-label":tx("options.matchType"),"#rule-value-label":tx("options.matchValue"),"#rule-label-label":tx("options.ruleName"),"#rule-name-label":tx("options.tabName"),"#rule-pattern-help":tx("options.patternHelp"),"#rule-help-title":tx("options.guideTitle"),"#rule-help-intro":tx("options.guideIntro"),"#rule-cancel":tx("common.cancel"),"#rule-help-done":tx("options.done"),"#rule-test-title":tx("options.testRule"),"#rule-test-description":tx("options.testDescription"),"#rule-test-run":tx("options.runRuleTest"),"#rule-test-label":tx("options.testUrlLabel")};
+  const text: Record<string, string> = {"#page-title":tx("options.title"),"#page-subtitle":tx("options.subtitle"),"#permission":tx("options.enableAutomatic"),"#permission-tip":tx("options.permissionHelp"),"#permission-faq-title":tx("options.permissionQuestion"),"#permission-faq-copy":tx("options.permissionFaq"),"#add":tx("options.newRule"),"#rules-heading":tx("options.rulesHeading"),"#import-export-title":tx("options.importExport"),"#export":tx("options.export"),"#import-label-text":tx("options.import"),"#privacy-link":tx("options.privacy"),"#feedback-link":tx("options.feedback"),"#footer-copy":tx("options.footer"),"#rule-help-feedback-copy":tx("options.ruleHelpFeedback"),"#rule-help-feedback-link":tx("options.sendFeedback"),"#status-feedback-copy":tx("options.statusFeedback"),"#status-feedback-link":tx("options.reportProblem"),"#rule-test-feedback-copy":tx("options.ruleTestFeedback"),"#rule-test-feedback-link":tx("options.sendFeedback"),"#rule-kind-label":tx("options.matchType"),"#rule-value-label":tx("options.matchValue"),"#rule-label-label":tx("options.ruleName"),"#rule-name-label":tx("options.tabName"),"#rule-pattern-help":tx("options.patternHelp"),"#rule-help-title":tx("options.guideTitle"),"#rule-help-intro":tx("options.guideIntro"),"#rule-cancel":tx("common.cancel"),"#rule-help-done":tx("options.done"),"#rule-test-title":tx("options.testRule"),"#rule-test-description":tx("options.testDescription"),"#rule-test-run":tx("options.runRuleTest"),"#rule-test-label":tx("options.testUrlLabel")};
   for (const [selector, value] of Object.entries(text)) { const element = document.querySelector<HTMLElement>(selector); if (element) element.textContent = value; }
   const ruleHelp = document.querySelector<HTMLElement>("#rule-help"); if (ruleHelp) ruleHelp.setAttribute("aria-label", tx("options.ruleGuide"));
   const formHelp = document.querySelector<HTMLElement>("#rule-form-help"); if (formHelp) formHelp.setAttribute("aria-label", tx("options.ruleHelp"));
@@ -48,7 +49,24 @@ const request = <T>(message: UiRequest, timeoutMs?: number): Promise<T> => {
     void response.then((value) => { window.clearTimeout(timeout); resolve(value); }, (error) => { window.clearTimeout(timeout); reject(error); });
   });
 };
-const status = (text: string, danger = false) => { const element = $("#status"); element.textContent = text; element.classList.toggle("danger-status", danger); element.setAttribute("role", danger ? "alert" : "status"); };
+const status = (text: string, danger = false, source?: FeedbackSource) => {
+  const element = $("#status");
+  element.textContent = text;
+  element.classList.toggle("danger-status", danger);
+  element.setAttribute("role", danger ? "alert" : "status");
+  const hint = document.querySelector<HTMLElement>("#status-feedback");
+  const link = document.querySelector<HTMLAnchorElement>("#status-feedback-link");
+  if (hint) hint.hidden = !source;
+  if (link && source) link.href = feedbackUrl(source);
+};
+for (const [selector, source] of [
+  ["#feedback-link", "options_footer"],
+  ["#rule-help-feedback-link", "options_rule_guide"],
+  ["#rule-test-feedback-link", "options_rule_test"]
+] as const) {
+  const link = document.querySelector<HTMLAnchorElement>(selector);
+  if (link) link.href = feedbackUrl(source);
+}
 function updatePermissionUi(granted: boolean) {
   const permission = $("#permission") as HTMLButtonElement;
   permission.disabled = granted;
@@ -160,6 +178,8 @@ function updateRuleFields() {
 function clearRuleTestResult() {
   ruleTestResult.textContent = "";
   ruleTestResult.className = "rule-test-result";
+  const hint = document.querySelector<HTMLElement>("#rule-test-feedback");
+  if (hint) hint.hidden = true;
 }
 function updateRuleTestToggleText() {
   ruleTestToggle.textContent = tx(ruleTest.hidden ? "options.testRule" : "options.hideRuleTest");
@@ -198,6 +218,8 @@ function openRuleDialogForTest(rule: RenameRule) {
 function runRuleTest() {
   const result = previewRule({ kind: ruleKind.value as "exact-url" | "url-pattern" | "host", value: ruleValue.value, name: ruleName.value, rawUrl: ruleTestUrl.value });
   ruleTestResult.className = `rule-test-result ${result.status}`;
+  const feedback = document.querySelector<HTMLElement>("#rule-test-feedback");
+  if (feedback) feedback.hidden = result.status !== "unmatched";
   if (result.status === "matched") {
     const name = document.createElement("strong");
     name.textContent = result.name;
@@ -279,7 +301,7 @@ form.addEventListener("submit", async (event) => {
     closeRuleDialog();
     await load();
     updatePermissionUi(automaticEnabled);
-    status(automaticEnabled ? tx("options.ruleSaved") : tx("options.ruleSavedPermissionDenied"), !automaticEnabled);
+    status(automaticEnabled ? tx("options.ruleSaved") : tx("options.ruleSavedPermissionDenied"), !automaticEnabled, automaticEnabled ? undefined : "options_permission");
   }
   catch (reason) {
     console.error(LOG_PREFIX, "rule editor save failed", { traceId, reason });
@@ -294,12 +316,14 @@ $("#permission").addEventListener("click", async () => {
   try {
     const granted = await chrome.permissions.request({ origins: ["http://*/*", "https://*/*"] });
     updatePermissionUi(granted);
-    status(granted ? tx("options.permissionGranted") : tx("options.permissionDenied"), !granted);
+    status(granted ? tx("options.permissionGranted") : tx("options.permissionDenied"), !granted, granted ? undefined : "options_permission");
   } catch {
     updatePermissionUi(false);
-    status(tx("options.permissionDenied"), true);
+    status(tx("options.permissionDenied"), true, "options_permission");
   }
 });
 $("#export").addEventListener("click",async()=>{const json=await request<string>({type:"EXPORT_RULES"});const url=URL.createObjectURL(new Blob([json],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=`tab-rename-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
-$("#import").addEventListener("change",async(event)=>{const file=(event.target as HTMLInputElement).files?.[0];if(!file)return;if(file.size>1_048_576){status(tx("options.fileTooLarge"));return;}try{const result=await request<{added:number;updated:number;skipped:number;errors:string[]}>({type:"IMPORT_RULES",json:await file.text()});status(tx("options.importComplete", {added:result.added,updated:result.updated,skipped:result.skipped,errors:result.errors.length}));await load();}catch(error){status(error instanceof Error?error.message:tx("common.operationFailed"));}});
+// Keep the file input inside #import-label: translations only touch the text span,
+// and the value is cleared afterwards so re-importing the same file fires "change".
+$("#import").addEventListener("change",async(event)=>{const input=event.target as HTMLInputElement;const file=input.files?.[0];if(!file)return;try{if(file.size>1_048_576){status(tx("options.fileTooLarge"),true,"options_import");return;}const result=await request<{added:number;updated:number;skipped:number;errors:string[]}>({type:"IMPORT_RULES",json:await file.text()});status(tx("options.importComplete", {added:result.added,updated:result.updated,skipped:result.skipped,errors:result.errors.length}),result.errors.length>0,result.errors.length>0?"options_import":undefined);if(result.errors.length)console.warn(LOG_PREFIX,"import row errors",result.errors);await load();}catch(error){status(error instanceof Error?error.message:tx("common.operationFailed"),true,"options_import");}finally{input.value="";}});
 void load().then(async () => { language = normalizeLanguage(state.settings.language); applyTranslations(); render(); await refreshPermissionUi(); return openPrefilledRuleFromLocation(); }).catch((error)=>status(error instanceof Error?error.message:tx("common.operationFailed")));

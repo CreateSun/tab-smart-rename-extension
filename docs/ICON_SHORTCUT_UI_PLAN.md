@@ -11,7 +11,7 @@
 4. 语言选择仍是全局手动偏好，保存到 `chrome.storage.local`。Options 与 Onboarding 共用同一种紧凑分段按钮样式，任一页面修改都会影响所有扩展界面。
 5. Onboarding 必须使用 manifest 实际的扩展图标，不再绘制字母占位图。
 6. Chrome `suggested_key` 只是建议键，冲突时可能不分配。页面必须展示 `chrome.commands.getAll()` 返回的真实状态；不伪装为已绑定。
-7. macOS 新安装建议键改为与硬刷新不冲突的 `Alt+Shift+R`。已安装用户的现有自定义绑定由 Chrome 管理，不强制覆盖。
+7. 新安装建议键改为 macOS `Command+Shift+E`、Windows/Linux `Ctrl+Shift+E`：避开硬刷新 `Cmd+Shift+R`，也避开 DevTools/VS Code 常用的 `Cmd+Shift+P`。已安装用户的现有自定义绑定由 Chrome 管理，不强制覆盖。
 
 ## 实施拆分
 
