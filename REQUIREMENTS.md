@@ -137,7 +137,7 @@ Popup、快捷键、右键菜单不得各自实现另一套优先级或存储逻
 ### FR-01 打开重命名界面
 
 - 用户点击扩展图标必须打开 popup。
-- 必须提供一个 manifest command 打开 popup；建议默认快捷键为 Alt+Shift+R（macOS 为 Option+Shift+R），最终默认值需在实现阶段检查与 Chrome 保留/常见快捷键冲突。
+- 必须提供一个 manifest command 打开重命名界面；建议默认快捷键为 Ctrl+Shift+E（macOS 为 Command+Shift+E），最终默认值需在实现阶段检查与 Chrome 保留/常见快捷键冲突。
 - 必须注册网页内容区域的右键菜单“重命名此标签页…”，点击后应打开可完成同等操作的扩展界面或最小输入流程。
 - 首次使用时必须说明快捷键可在 chrome://extensions/shortcuts 修改。
 

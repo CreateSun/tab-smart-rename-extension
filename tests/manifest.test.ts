@@ -3,8 +3,8 @@ import manifest from "../manifest.json";
 
 describe("extension entry contract", () => {
   it("uses the page overlay instead of an action popup", () => expect("default_popup" in manifest.action).toBe(false));
-  it("suggests Alt Shift R without conflicting with Chrome hard reload", () => {
-    expect(manifest.commands._execute_action.suggested_key.mac).toBe("Alt+Shift+R");
-    expect(manifest.commands._execute_action.suggested_key.default).toBe("Alt+Shift+R");
+  it("suggests Cmd Shift E on macOS and Ctrl Shift E elsewhere", () => {
+    expect(manifest.commands._execute_action.suggested_key.mac).toBe("Command+Shift+E");
+    expect(manifest.commands._execute_action.suggested_key.default).toBe("Ctrl+Shift+E");
   });
 });

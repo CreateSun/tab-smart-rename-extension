@@ -3,6 +3,7 @@ import type { ContentEvent, UiRequest } from "../shared/messages";
 import { openOverlayOnPage } from "./open-overlay";
 import { readStoredState } from "../storage/state";
 import { translate } from "../shared/i18n";
+import { feedbackUrl } from "../shared/feedback";
 import { handleContextMenuClick, refreshContextMenu } from "./context-menus";
 const AUTO_CONTENT_ID = "tab-rename-auto-content";
 const AUTO_ORIGINS = ["http://*/*", "https://*/*"];
@@ -33,7 +34,7 @@ async function openRenameOverlay(tabId?: number): Promise<void> {
 chrome.runtime.onInstalled.addListener((details) => {
   void refreshContextMenu();
   if (details.reason === "install") chrome.tabs.create({ url: chrome.runtime.getURL("onboarding.html") });
-  chrome.runtime.setUninstallURL("https://tally.so/r/obJD4x");
+  chrome.runtime.setUninstallURL(feedbackUrl("uninstall"));
   void syncAutomaticContentScript();
 });
 chrome.runtime.onStartup.addListener(() => { void syncAutomaticContentScript(); void refreshContextMenu(); });

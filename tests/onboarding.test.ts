@@ -56,7 +56,7 @@ describe("onboarding localization", () => {
     (chrome.commands.getAll as unknown as ReturnType<typeof vi.fn>).mockResolvedValue([{ name: "_execute_action", shortcut: "", description: "" }]);
     (chrome.runtime.sendMessage as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: true, data: { settings: { language: "en" } } });
     await import("../src/ui/onboarding");
-    await vi.waitFor(() => expect(document.querySelector("#shortcutLabel")?.textContent).toBe("Not assigned"));
+    await vi.waitFor(() => expect(document.querySelector("#shortcutLabel")?.textContent).toBe("Not set yet"));
     expect(document.querySelector("#shortcutStatus")?.classList.contains("needs-action")).toBe(true);
     (document.querySelector("#googleTest") as HTMLButtonElement).click();
     expect(chrome.tabs.create).toHaveBeenCalledWith({ url: "https://www.google.com/" });

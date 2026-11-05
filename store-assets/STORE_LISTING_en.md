@@ -39,7 +39,7 @@ Language: the extension name, description, renaming interface, rule manager, onb
 
 Works on regular HTTP and HTTPS webpages. Chrome-protected pages (chrome://, Chrome Web Store, new tab, and other extension pages) cannot be modified. Local files and browser PDF viewers are not guaranteed to work.
 
-Uninstalling may open an optional feedback page hosted by Tally. No tab names, URLs, or rules are included in that page's URL.
+The extension never opens a network connection on its own. Uninstalling may open an optional feedback page hosted by Tally, and feedback links in the rules page, welcome page, and rule guide open only when you click them. No tab names, URLs, or rules are included in those links; only the entry point name and extension version are attached.
 
 ## Privacy fields
 

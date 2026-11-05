@@ -5,10 +5,11 @@
   <div class="rules-panel-head"><h2 id="rules-heading"></h2><span id="rule-count" class="rule-count"></span></div>
   <div class="toolbar"><input id="search" type="search"><button id="add"></button></div>
   <p id="status" role="status"></p>
+  <p id="status-feedback" class="feedback-hint" hidden><span id="status-feedback-copy"></span> <a id="status-feedback-link" target="_blank" rel="noopener"></a></p>
   <div id="rules" class="rule-list"></div>
 </section>
 <section><h2 id="import-export-title"></h2><div class="inline"><button id="export" class="secondary"></button><label id="import-label" class="button secondary" for="import"><span id="import-label-text"></span><input id="import" type="file" accept="application/json,.json" hidden></label></div></section>
-<footer><span id="footer-copy"></span> · <a id="privacy-link" href="PRIVACY.md" target="_blank"></a></footer></main>
+<footer><span id="footer-copy"></span> · <a id="privacy-link" href="PRIVACY.md" target="_blank" rel="noopener"></a> · <a id="feedback-link" target="_blank" rel="noopener"></a></footer></main>
 <div id="rule-dialog" class="rule-dialog-backdrop" hidden><section class="rule-dialog" role="dialog" aria-modal="true" aria-labelledby="rule-dialog-title">
   <form id="rule-form" novalidate>
     <header class="rule-dialog-header"><div><p class="eyebrow">// RULE_EDITOR</p><h2 id="rule-dialog-title"></h2></div><button id="rule-close" class="icon-button" type="button">×</button></header>
@@ -30,6 +31,7 @@
       <label id="rule-test-label" class="field-label" for="rule-test-url"></label>
       <div class="rule-test-controls"><input id="rule-test-url" class="rule-test-url" type="url" autocomplete="off" spellcheck="false" aria-describedby="rule-test-description rule-test-result"><button id="rule-test-run" class="secondary" type="button"></button></div>
       <p id="rule-test-result" class="rule-test-result" aria-live="polite" aria-atomic="true"></p>
+      <p id="rule-test-feedback" class="feedback-hint" hidden><span id="rule-test-feedback-copy"></span> <a id="rule-test-feedback-link" target="_blank" rel="noopener"></a></p>
     </div>
     <p id="rule-error" class="error" role="alert"></p>
     <div class="dialog-actions"><button id="rule-form-help" class="help-button form-help-button" type="button" aria-haspopup="dialog">?</button><span class="dialog-actions-spacer"></span><button id="rule-cancel" class="secondary" type="button"></button><button id="rule-submit" type="submit"><span></span> <kbd>↵</kbd></button></div>
@@ -46,5 +48,6 @@
     <article><h3 data-i18n="guidePatternWildcard"></h3><p data-i18n="guideWildcardDescription"></p><dl><dt data-i18n="guideRule"></dt><dd><code>https://docs.example.com/guides/.*</code></dd><dt data-i18n="guideActual"></dt><dd><code>https://docs.example.com/guides/getting-started</code></dd><dt data-i18n="guideTitleEffect"></dt><dd><code data-i18n="exampleWildcard"></code></dd></dl></article>
     <article><h3 data-i18n="guidePatternCapture"></h3><p data-i18n="guideCaptureDescription"></p><dl><dt data-i18n="guideRule"></dt><dd><code>https://app.example.com/reports/(daily|weekly)</code></dd><dt data-i18n="guideActual"></dt><dd><code>https://app.example.com/reports/weekly</code></dd><dt data-i18n="guideTitleEffect"></dt><dd><code data-i18n="exampleCapture"></code></dd></dl></article>
   </section>
+  <p class="feedback-hint"><span id="rule-help-feedback-copy"></span> <a id="rule-help-feedback-link" target="_blank" rel="noopener"></a></p>
   <div class="dialog-actions"><button id="rule-help-done" type="button"></button></div>
 </section></div><script src="options.js"></script></body></html>
